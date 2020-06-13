@@ -154,6 +154,7 @@ class OSL_Notebook_Test():
         print(args)
         return args
 
+    # FIXME: subprocess.check_output won't work for all calls
     def convert_to_subprocess(self, code: str, assignments: dict, spaces: int):
         arg_lst = None
         code_lst = self.remove_dollar_magic(code[1:])
@@ -183,6 +184,7 @@ class OSL_Notebook_Test():
         regex = "^( |)*\w*"
         return (re.search(regex, var).group(0)).replace(" ", "")
 
+    # FIXME: handle all jupyter notebook magic commands
     def prepare_code_cell(self, code):
         assignments = {}
         code_block = """"""
