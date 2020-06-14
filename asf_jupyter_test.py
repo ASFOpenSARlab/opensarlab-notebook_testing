@@ -70,7 +70,7 @@ class OSL_Notebook_Test():
                 contents[i] = replacement_code
         self.replace_cells.update({index: contents})
 
-    def replace_cell(self, search_str, code_list):
+    def replace_cell(self, search_str, replacement_code=""):
         index = self.find(search_str)
 
         # TODO: decide how to handle duplicates,
@@ -81,7 +81,7 @@ class OSL_Notebook_Test():
         else:
             raise SearchFailedException
 
-        self.replace_cells.update({index: code_list})
+        self.replace_cells.update({index: [replacement_code]})
 
     def skip_cell(self, search_str):
         index = self.find(search_str)
@@ -206,7 +206,7 @@ class OSL_Notebook_Test():
                 # print(f"VAL: '{val}'")            ########### DEBUG
                 assignments.update({base_var: val})
             spaces = self.count_leading_whitespaces(c)
-            if c[spaces] == '!':
+            if len(c) > 0 and c[spaces] == '!':
                 c = self.convert_to_subprocess(c, assignments, spaces)
             code_block = f"""{code_block}{c}"""
         return code_block
