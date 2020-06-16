@@ -82,7 +82,8 @@ test.replace_line("if coord_choice.value == 'UTM'", "if coord_choice.value == 'U
 
 test.replace_line("if coord_choice.value == 'UTM':", "if coord_choice.value == 'UTM':", "    if coord_choice == 'UTM':")
 
-test.replace_line("elif coord_choice.value == 'Lat/Long':", "elif coord_choice.value == 'Lat/Long':", "    elif coord_choice == 'Lat/Long':")
+test.replace_line("elif coord_choice.value == 'Lat/Long':", "elif coord_choice.value == 'Lat/Long':",
+                  "    elif coord_choice == 'Lat/Long':")
 
 ######### SKIP CELLS ###########
 
@@ -101,6 +102,19 @@ skip_em = ["subscriptions = get_hyp3",
            ]
 for search_str in skip_em:
     test.replace_cell(search_str)
+
+######## TEST CELLS ###########
+test_reprojection = """
+t_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/NOTEBOOK_TESTING/rtc_products/"
+t_paths = [f"{t_pth}S1A_IW_GRDH_1SDV_20170223T120442_20170223T120507_015411_0194AE_AFD2-POEORB-30m-power-rtc-gamma/rS1A_IW_RT30_20170223T120442_G_gpn_VH.tif",
+f"{t_pth}S1A_IW_GRDH_1SDV_20170223T120442_20170223T120507_015411_0194AE_AFD2-POEORB-30m-power-rtc-gamma/rS1A_IW_RT30_20170223T120442_G_gpn_VV.tif"]
+for t_p in t_pths:
+    if os.path.exists(t_p):
+        test.log(f"PASSED: Reprojected file present: {t_p}")
+    else:
+        test.log(f"FAILED: Missing Reprojected File: {t_p}")
+"""
+test.add_test_cell("reproject_indicies = [i for", test_reprojection)
 
 all_the_code = test.assemble_test_code()
 

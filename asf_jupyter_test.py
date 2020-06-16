@@ -1,9 +1,11 @@
 # Alaska Satellite Facility
 # ASF_Jupyter_Test.py
 # Alex Lewandowski
-# 6-14-2020
+# 6-15-2020
 
 import json
+import logging
+import os
 import re
 
 
@@ -97,6 +99,14 @@ class ASFNotebookTest:
         self.cells = self.get_cells(notebook_path)
         self.replace_cells = {}
         self.skip_cells = []
+        self.test_cells = {}
+
+        logging.basicConfig(filename=f"{os.path.basename(notebook_path).split('.')[0]}.log",
+                            format='%(asctime)s %(message)s',
+                            filemode='w')
+
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.INFO)
 
     @staticmethod
     def get_loop_var_names(cell_code: list) -> list:
@@ -149,6 +159,22 @@ class ASFNotebookTest:
         """
         string = string.replace('check_output', 'run')
         return string.replace("stderr=subprocess.PIPE, shell=True)", "capture_output=True)")
+
+    @staticmethod
+    def f_str_to_arg_lst(f_str: str) -> list:
+        """
+        f_str: string representation of an f-string command line call
+               ex: 'f"gdal_merge.py -o {output} {dup_dates[dup_date]}"'
+        returns: formatted list of command line call elements for  use
+                 as a subprocess arg list
+        """
+        args = f_str.split(' ')
+        args[0] = args[0][2:]  # drop the f"
+        args[len(args) - 1] = args[len(args) - 1][:-1]  # drop the "
+        for i, arg in enumerate(args):
+            if is_braced(arg):
+                args[i] = f'f"{args[i]}"'
+        return args
 
     def find(self, string: str) -> list:
         """
@@ -211,6 +237,19 @@ class ASFNotebookTest:
             raise SearchFailedException
         self.replace_cells.update({index: [replacement_code]})
 
+    def add_test_cell(self, search_str: str, test_code: str):
+        """
+        search_str: a search string to locate cell
+        test_code: custom test code to append to target cell
+
+        updates self.test_cells dict with {target cell index: test_code}
+        """
+        index = self.find(search_str)
+        self.test_cells.update({index: test_code})
+
+    def log(self, message: str):
+        self.logger.info(message)
+
     def convert_to_subprocess(self, code: str, assignments: dict, loop_vars: list) -> str:
         """
         code: a string of a ! Jupyter Notebook magic command
@@ -240,13 +279,9 @@ class ASFNotebookTest:
         spaces = " " * spaces
         subprocess_cmd = f"process = subprocess.check_output(["
         if is_f_string(code_lst[0]):
-            args = code_lst[0].split(' ')
-            args[0] = args[0][2:]  # drop the f"
-            args[len(args) - 1] = args[len(args) - 1][:-1]  # drop the "
-            for i, arg in enumerate(args):
-                if is_braced(arg):
-                    args[i] = f'f"{args[i]}"'
-            code_lst = args
+            code_lst = self.f_str_to_arg_lst(code_lst[0])
+        elif is_format_string((code[0])):
+            pass
         for i, exp in enumerate(code_lst):
             if exp in loop_vars or (is_expr(exp) and not is_filename(exp)) or is_f_string(exp):
                 if i == 0:
@@ -306,6 +341,7 @@ class ASFNotebookTest:
         returns: a dictionary {code-cell index: prepared code-cell string}
         """
         print("Assembling Notebook Test Code...")
+        self.logger.info("Begin Assembling Test Code")
         all_the_code = {-1: "import subprocess"}
         for index in self.cells:
             if not stop_cell or index <= stop_cell:
@@ -316,5 +352,7 @@ class ASFNotebookTest:
                 else:
                     code = self.cells[index].contents
                 code = self.prepare_code_cell(code)
+                if index in self.test_cells:
+                    code = f"{code}\n{self.test_cells[index]}\n"
                 all_the_code.update({index: code})
         return all_the_code
