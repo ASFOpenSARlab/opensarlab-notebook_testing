@@ -2,11 +2,12 @@
 
 from getpass import getpass
 from asf_jupyter_test import ASFNotebookTest
+from asf_jupyter_test import std_out_io
 
 username = input("Earthdata Username: ")
 password = getpass("Earthdata Password: ")
 
-pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Prepare_Data_Stack_Hyp3.ipynb"
+pth = "/home/jovyan/notebooks/notebook_testing_dev/Prepare_Data_Stack_Hyp3.ipynb"
 test = ASFNotebookTest(pth)
 
 ######### REPLACE CELLS ###########
@@ -85,7 +86,7 @@ test.replace_line("if coord_choice.value == 'UTM':", "if coord_choice.value == '
 test.replace_line("elif coord_choice.value == 'Lat/Long':", "elif coord_choice.value == 'Lat/Long':",
                   "    elif coord_choice == 'Lat/Long':")
 
-######### SKIP CELLS ###########
+######### DECLARE SKIP CELLS ###########
 
 skip_em = ["subscriptions = get_hyp3",
            "subscription_id = subscription_id",
@@ -103,25 +104,26 @@ skip_em = ["subscriptions = get_hyp3",
 for search_str in skip_em:
     test.replace_cell(search_str)
 
-######## TEST CELLS ###########
+######## ADD TEST CELLS ###########
+
 test_reprojection = """
-t_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/NOTEBOOK_TESTING/rtc_products/"
+t_pth = "/home/jovyan/notebooks/notebooks/notebook_testing_dev/NOTEBOOK_TESTING/rtc_products/"
 t_paths = [f"{t_pth}S1A_IW_GRDH_1SDV_20170223T120442_20170223T120507_015411_0194AE_AFD2-POEORB-30m-power-rtc-gamma/rS1A_IW_RT30_20170223T120442_G_gpn_VH.tif",
 f"{t_pth}S1A_IW_GRDH_1SDV_20170223T120442_20170223T120507_015411_0194AE_AFD2-POEORB-30m-power-rtc-gamma/rS1A_IW_RT30_20170223T120442_G_gpn_VV.tif"]
-for t_p in t_pths:
+for t_p in t_paths:
     if os.path.exists(t_p):
-        test.log(f"PASSED: Reprojected file present: {t_p}")
+        test.log_test(f"PASSED: Reprojected file present: {t_p}")
     else:
-        test.log(f"FAILED: Missing Reprojected File: {t_p}")
+        test.log_test(f"FAILED: Missing Reprojected File: {t_p}")
 """
 test.add_test_cell("reproject_indicies = [i for", test_reprojection)
 
-all_the_code = test.assemble_test_code()
+######## RUN THE NOTEBOOK AND TEST CODE #########
 
+all_the_code = test.assemble_code(include_tests=True)
 for cell_index in all_the_code:
-    print("\n-----------------------------------------------------------------")
-    print(f"Cell Index: {cell_index}")
-    print(f"Code:\n {all_the_code[cell_index]}\n")
-    print("Output:")
-    exec(all_the_code[cell_index])
-
+    test.output(all_the_code[cell_index], cell_index, terminal=True, log=True)
+    with std_out_io() as stdio:
+        exec(all_the_code[cell_index])
+    print(f"Output: {stdio.getvalue()}")
+    test.log_info(f"Output: {stdio.getvalue()}")
