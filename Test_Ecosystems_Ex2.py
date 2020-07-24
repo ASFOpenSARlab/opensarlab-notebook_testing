@@ -42,7 +42,7 @@ else:
 """
 test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_extract)
 
-# Check that raster_stack.vrt was extracted
+# Check that raster_stack.vrt was created
 test_vv_vrt = """    
 if os.path.exists(\"raster_stack.vrt\"):
     test.log_test('p', f"Extracted raster_stack.vrt")
@@ -51,7 +51,7 @@ else:
 """
 test.add_test_cell("!gdalbuildvrt -separate raster_stack.vrt", test_vv_vrt)
 
-# Check that raster_stack_VV.dates was extracted
+# Check that raster_stack_VV.dates was created
 test_vv_dates = """
 if os.path.exists(\"raster_stack_VV.dates\"):
     test.log_test('p', f"Extracted raster_stack_VV.dates")
