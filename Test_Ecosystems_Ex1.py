@@ -21,9 +21,9 @@ test.replace_line(_to_replace, _to_replace, _replacement)
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
 if os.path.exists(f"{os.getcwd()}/{time_series_path}"):
-    test.log_test('p', f"{time_series_path} successfully copied from {time_series_path}")
+    test.log_test('p', f"{time_series_path} successfully copied from {s3_path}")
 else:
-    test.log_test('f', f"{time_series_path} NOT copied from {time_series_path}")
+    test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
 """
 test.add_test_cell("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
 
