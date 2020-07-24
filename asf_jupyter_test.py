@@ -1,8 +1,10 @@
 # Alaska Satellite Facility
 # ASF_Jupyter_Test.py
 # Alex Lewandowski
-# 6-16-2020
+# 6-25-2020
 
+import ast
+import astor
 import inspect
 import json
 import logging
@@ -40,6 +42,16 @@ def is_f_string(string: str) -> bool:
     return re.search(f_regex, string) is not None
 
 
+def search_subscriptable_start(line: str):
+    regex = "^\w*(\[\w*)\.?(\].)?"
+    results = re.search(regex, line)
+    if results:
+        t = results.group(0)
+        return results.group(0)
+    else:
+        return ""
+
+
 def count_leading_whitespaces(string: str) -> int:
     """
     returns the number of leading whitespaces in a string
@@ -73,21 +85,6 @@ def add_newline(code: str) -> str:
     if len(code) > 0 and code[-1] != "\n":
         code = f"{code}\n"
     return code
-
-
-def get_widget_type(line: str):
-    """
-    line: a string of python code, presumably containing a ipywidget call
-    returns: widget type or None (if type not supported)
-    """
-    if "SelectionRangeSlider" in line:
-        return "SelectionRangeSlider"
-    elif "RadioButtons" in line:
-        return "RadioButtons"
-    elif "SelectMultiple" in line:
-        return "SelectMultiple"
-    else:
-        return None
 
 
 @contextlib.contextmanager
@@ -132,6 +129,27 @@ class WidgetTypeNotHandled(Exception):
     pass
 
 
+class NotASTFunctionDef(Exception):
+    """
+    Raised when expecting an ast.FunctionDef object
+    """
+    pass
+
+
+class NotASTCall(Exception):
+    """
+    Raised when expecting an ast.Call object
+    """
+    pass
+
+
+class NotASTAssign(Exception):
+    """
+    Raised when expecting an ast.Assign object
+    """
+    pass
+
+
 class NotWidgetValueLine(Exception):
     """
     Raised when trying to parse a widget value from code
@@ -148,14 +166,14 @@ class Cell:
 
 
 class ASFNotebookTest:
-    def __init__(self, notebook_path: str):
+    def __init__(self, notebook_path: str, log_path: str):
         self.cells = self.get_cells(notebook_path)
         self.replace_cells = {}
         self.skip_cells = []
         self.test_cells = {}
         self.notebook_path = notebook_path
-        self.info_logger = setup_logger('info_logger', f"{notebook_path.split('.')[0]}.info.log")
-        self.test_logger = setup_logger('test_logger', f"{notebook_path.split('.')[0]}.test.log")
+        self.info_logger = setup_logger('info_logger', f"{log_path}/{os.path.basename(notebook_path).split('.')[0]}.info.log")
+        self.test_logger = setup_logger('test_logger', f"{log_path}/{os.path.basename(notebook_path).split('.')[0]}.test.log")
         self.code_dict = {}
 
     @staticmethod
@@ -167,7 +185,8 @@ class ASFNotebookTest:
         """
         var_lst = []
         for i, line in enumerate(cell_code):
-            if "for" in line and "enumerate" not in line:
+            if "for " in line and "enumerate" not in line:
+                # print(f"line: {line}") ####################################
                 var_lst.append(line.split(' ')[1])
             elif "enumerate" in line:
                 var_lst.append(line.split(' ')[1][:-1])
@@ -226,30 +245,6 @@ class ASFNotebookTest:
                 args[i] = f'{args[i]}'
         return args
 
-    @staticmethod
-    def search_func_names_called(line: str) -> list:
-        """
-        line: a python function call as a string
-        returns: a list of lists of function names called, along with
-                their occurrence counts
-
-        ex. line = "bla(do_a_thing_with_stuff(thing, stuff(0)), stuff(8)"
-            returns: [['bla', 1], ['do_a_thing_with_stuff', 1], ['stuff', 1], ['stuff', 2]]
-        """
-        bookkeeping = []
-        calls = []
-        regex = "(?<![A-Za-z])(([a-z][A-z|0-9]*[.])*[a-z][A-z]+)+\("
-        matches = re.finditer(regex, line)
-        if matches:
-            for match in matches:
-                m = match.group(0)
-                count = 1
-                if m in bookkeeping:
-                    count = bookkeeping.count(m) + 1
-                bookkeeping.append(m)
-                calls.append([m, count])
-        return calls
-
     def find(self, string: str) -> list:
         """
         takes: a search string
@@ -262,7 +257,8 @@ class ASFNotebookTest:
                     results.append(i)
         return results
 
-    def get_cells(self, notebook_path: str):
+    @staticmethod
+    def get_cells(notebook_path: str):
         """
         takes: a path to a Jupyter Notebook
         returns: a list of all (code) Cell objects in notebook
@@ -278,8 +274,15 @@ class ASFNotebookTest:
     def log_info(self, message: str):
         self.info_logger.info(message)
 
-    def log_test(self, message: str):
-        self.test_logger.info(message)
+    def log_test(self, passed: str, message: str):
+        if passed == 'p':
+            self.test_logger.info(f"PASSED: {message}")
+        elif passed == 'f':
+            self.test_logger.info(f"FAILED: {message}")
+        elif passed == 'e':
+            self.test_logger.info(f"EXCEPTION: {message}")
+        else:
+            raise ValueError("Valid values for passed are p (passed), f (failed), and e (exception)")
 
     # TODO: decide how to handle duplicates. Only handle 1st and give warning?
     def replace_line(self, cell_search_str: str, line_search_str: str, replacement_code: str):
@@ -314,6 +317,7 @@ class ASFNotebookTest:
         if len(index) > 0:
             index = index[0]
         else:
+            print(f"Failed to find: \"{search_str}\"")
             raise SearchFailedException
         self.replace_cells.update({index: [replacement_code]})
 
@@ -325,42 +329,28 @@ class ASFNotebookTest:
         updates self.test_cells dict with {target cell index: test_code}
         """
         index = self.find(search_str)[0]
-        self.test_cells.update({index: test_code})
+        try:
+            self.test_cells.update({index: f"{self.test_cells[index]}\n{test_code}"})
+        except KeyError:
+            self.test_cells.update({index: test_code})
 
-    def convert_to_subprocess(self, code: str, assignments: dict, loop_vars: list) -> str:
+    @staticmethod
+    def magic_to_subprocess(code: str) -> str:
         """
         code: a string of a ! Jupyter Notebook magic command
-        assignments: a dict containing all assigned variable names and values in code cell
-        loop_vars: a list of all loop variable names in code cell
-
-        returns: a string containing the ! command converted into subprocess.check_output
-                 and subprocess.run commands, which when called, tries to call 'check_output' first,
-                 and then 'run' if it encounters subprocess.CalledProcessError
+        returns: a string containing the ! command converted into 
+                 a subprocess.call command 
         """
-        arg_lst = []
-        args = None
-        spaces = count_leading_whitespaces(code)
-        code = code[spaces + 1:]  # drop the ! magic char
+        space_count = count_leading_whitespaces(code)
+        print(f"code: {code}")
+        code = code[space_count + 1:]  # drop the ! magic char
+        spaces = space_count * " "
         code_lst = code.split(' ')
-        code_lst = self.remove_dollar_magic(code_lst)
-        for i, exp in enumerate(code_lst):
-            if exp == "":
-                continue
-            if len(exp) > 0 and exp[-1] == '\n':
-                code_lst[i] = exp[:-1]
-            if code_lst[i] in assignments:
-                code_lst[i] = assignments[code_lst[i]]
-            elif code_lst[i] in locals():
-                code_lst[i] = locals()[code_lst[i]]
-        spaces = " " * spaces
-        subprocess_cmd = f"process = subprocess.check_output(["
-        if is_f_string(code_lst[0]):
-            code_lst = self.f_str_to_arg_lst(code_lst[0])
-            code_lst = " ".join(code_lst)
-            return f'{spaces}subprocess.call(f"{code_lst}", shell=True)\n'
-        else:
-            code_lst = " ".join(code_lst)
-            return f'{spaces}subprocess.call({code_lst}, shell=True)\n'
+        for i, code in enumerate(code_lst):
+            if code[0] == '$':
+                code_lst[i] = f'{{{code[1:]}}}'  # drop the $ magic
+        code_str = (" ".join(code_lst)).replace('\n', '')
+        return f'{spaces}subprocess.call(f"{code_str}", shell=True)\n'
 
     # TODO: handle more jupyter notebook magic commands as needed
     def prepare_code_cell(self, code: list) -> str:
@@ -371,12 +361,10 @@ class ASFNotebookTest:
         returns: a string of code-cell code, ready to run, with
                  Jupyter Notebook magic commands handled
         """
-        loop_vars = self.get_loop_var_names(code)
         assignments = {}
         code_block = """"""
         for c in code:
-            if ('%%' in c and "\"" not in c) or \
-                    "clear_output()" in c:
+            if len(c) > 0 and c[0] == '%' or "clear_output()" in c:
                 continue
             assignment_regex = "^[ |A-z|0-9]*(=| =)[^=]"
             assignment = re.search(assignment_regex, c)
@@ -393,7 +381,7 @@ class ASFNotebookTest:
                 assignments.update({base_var: val})
             spaces = count_leading_whitespaces(c)
             if len(c) > 0 and c[spaces] == '!':
-                c = self.convert_to_subprocess(c, assignments, loop_vars)
+                c = self.magic_to_subprocess(c)
             code_block = f"""{code_block}{c}"""
         return code_block
 
@@ -419,73 +407,112 @@ class ASFNotebookTest:
                 all_the_code.update({index: code})
         return all_the_code
 
-    def get_calls(self, line: str) -> list:
+    def get_calls(self, tree) -> list:
         """
-        line: a string of python code
-        returns: a list of strings of all function calls in line
-
-        ex: line: "do_a_thing(get_stuff('grapes', sour=True), 37, os.getcwd())"
-            returns: ["do_a_thing(get_stuff('grapes', sour=True), 37, os.getcwd())",
-                     "get_stuff('grapes', sour=True)",
-                     "os.getcwd()"]
+        tree: an ast object
+        returns: a list of ast.Call nodes
         """
         calls = []
-        assignment = get_assignment_start(line)
-        if assignment != "":
-            line = line.replace(assignment, "")
-        func_names = self.search_func_names_called(line)
-        for func_name in func_names:
-            left_parenth = 1
-            right_parenth = 0
-            line_temp = line.split(func_name[0])[func_name[1]]
-            for i, char in enumerate(line_temp):
-                if char == '(':
-                    left_parenth += 1
-                elif char == ')':
-                    right_parenth += 1
-                if left_parenth == right_parenth:
-                    function = f"{func_name[0]}{line_temp[:i]})"
-                    calls.append(function)
-                    break
+        for node in ast.walk(tree):
+            if type(node) == ast.Call:
+                calls.append(node)
         return calls
 
-    def get_first_arg(self, line: str) -> str:
+    def get_format_calls(self, tree) -> list:
         """
-        line: a string function call with or without an assignment
-        returns: a string of the first arg in the function call
-
-        ex: line: "my_var = do_a_thing(get_stuff('grapes', sour=True), 37, os.getcwd())"
-            returns: "get_stuff('grapes', sour=True)"
+        tree: ast object
+        returns: a list of ast.Call nodes of str.format calls
         """
-        arg = ""
-        assignment = get_assignment_start(line)
-        if assignment != "":
-            line = line.replace(assignment, '')
-        func_name = (self.search_func_names_called(line)[0])[0][:-1]
-        line = line.replace(f"{func_name}(", '')
-        brace = False
-        bracket = False
-        parenth = False
-        for i, char in enumerate(line[:-1]):
-            if char in ['[', ']']:
-                bracket = (char == '[')
-            elif char in ['{', '}']:
-                brace = (char == '{')
-            elif char in ['(', ')']:
-                parenth = (char == '(')
-            open_container = brace or bracket or parenth
-            if char == ',' and not open_container:
-                break
+        calls = self.get_calls(tree)
+        format_calls = []
+        for call in calls:
+            for node in ast.walk(call):
+                if type(node) == ast.Call:
+                    if type(node.func) == ast.Attribute and \
+                            node.func.attr == 'format' and \
+                            astor.to_source(node)[0:3] == '"""':
+                        format_calls.append(node)
+        return list(set(format_calls))
+    
+    def get_func_name(self, call_node: ast.Call) -> str:
+        """
+        call_node: an ast.Call object
+        returns: the string name of the function being called
+        """
+        if type(call_node.func) == ast.Attribute:
+            return call_node.func.attr
+        elif type(call_node.func) == ast.Name:
+            return call_node.func.id
+        
+    def get_assignment(self, assign_node: ast.Call) -> str:
+        """
+        call_node: an ast.Call object
+        returns: the string name of the function being called
+        """
+        ass = ""
+        if type(assign_node.targets[0]) == ast.Tuple:
+            print(f"ASSIGN NODE TARGETS: {assign_node.targets[0].elts}") ######################################
+            for elt in assign_node.targets[0].elts:
+                ass = f"{ass}, {ass}"
+            return ass[1:]
+        elif type(assign_node) == ast.Assign:
+            return assign_node.targets[0].id
+        else: 
+            raise NotASTAssign
+        
+    def has_widget(self, call_node: ast.Call) -> bool:
+        """
+        call_node: an ast.Call object
+        returns: true if function call contains "widgets"
+        """
+        return 'widgets' in astor.to_source(call_node.func)
+        
+    def get_first_arg(self, func_def_node: ast.FunctionDef) -> str:
+        """
+        func_def_node: an ast.FunctionDef object
+        returns: string name of first function argument
+                 or an empty string if there are no args
+        """
+        if type(func_def_node) == ast.FunctionDef:
+            if len(func_def_node.args.args) > 0:
+                return func_def_node.args.args[0].arg
             else:
-                arg = f"{arg}{char}"
-        return arg
+                return ""
+        else:
+            raise NotASTFunctionDef
+            
+    def get_first_param(self, call_node: ast.Call) -> str:
+        if type(call_node) == ast.Call:
+            if len(call_node.args) > 0:
+                return astor.to_source(call_node.args[0])
+            else:
+                return ""
+        else:
+            raise NotASTCall
+        
+    def get_widget_type(self, call_node: ast.Call) -> str:
+        """
+        line: a string of python code, presumably containing a ipywidget call
+        returns: widget type or None (if type not supported)
+        """
+        return call_node.func.attr
+            
+    def code_list_to_str(self, code_list: list) -> str:
+        """
+        code_list: list of code strings with correct indentation
+        returns: newline seperated code string
+        """
+        code = ""
+        for line in code_list:
+            code = f"{code}{line}"
+        return code
 
-    def get_widget_details(self, line: str, to_import: list = None) -> dict:
+    def get_widget_details(self, cell_code: str, to_import: list = None) -> dict:
         """
         Assumes that the first arg for functions using widgets is the container
         used for the widget option arg.
 
-        line: a line of code
+        cell_code: a string of all code in a code cell
         to_import: a list of names of imports needed function call code inspections
         returns: {"type": widget_type, "container": widget_container} if a widget call is
                  discovered or an empty dict if none is found
@@ -497,13 +524,20 @@ class ASFNotebookTest:
                 exec(f"import {imp}")
             except ModuleNotFoundError:
                 raise
-        func_calls = self.get_calls(line)
+        tree = ast.parse(cell_code)
+        func_calls = self.get_calls(tree)
         widget_container = None
         widget_type = None
+        assignment = None
         for call in func_calls:
+            func_name = self.get_func_name(call) 
+            for node in ast.walk(tree):
+                if type(node) == ast.Assign and func_name in astor.to_source(node):
+                    assignment = self.get_assignment(node)
+                    break
             source = None
             try:
-                source = inspect.getsourcelines(eval(f"asf_notebook.{call.split('(')[0]}"))[0]
+                source = ast.parse(inspect.getsource(eval(f"asf_notebook.{func_name}")))
             except NameError:
                 pass
             except AttributeError:
@@ -511,16 +545,26 @@ class ASFNotebookTest:
             except TypeError:
                 pass
             if source:
-                for src_line in source:
-                    if "widgets" in src_line:
-                        widget_container = self.get_first_arg(call)
-                        widget_type = get_widget_type(src_line)
-                        break
-                if widget_type and widget_container:
-                    return {"type": widget_type, "container": widget_container}
+                for source_call in self.get_calls(source):
+                    if self.has_widget(source_call):
+                        widget_container = self.get_first_param(call)
+                        widget_type = self.get_widget_type(source_call)
+                        return {"func_name": assignment, 
+                                "type": widget_type, 
+                                "container": widget_container}
         return {}
+    
+    def replace_widget_dot_value(self, widget_name: str):
+        """
+        widget_name: the variable name of a widget
+        void: replaces all occurrences of widget_name.value in self.code_dict
+              with widget_name
+        """
+        value = f"{widget_name}.value"
+        for code_cell_index in self.code_dict:
+            self.code_dict[code_cell_index] = self.code_dict[code_cell_index].replace(value, widget_name)
 
-    def widget_replacement_code(self, widget_details: dict, widget_name: str) -> list:
+    def widget_replacement_code(self, widget_details: dict) -> list:
         """
         widget_details: {'type' : string widget type name,
                          'container': variable name of widget data container}
@@ -533,7 +577,7 @@ class ASFNotebookTest:
                 f'widget_container = {widget_details["container"]}',
                 'for item in widget_container:',
                 '    print(item)',
-                f'{widget_name} = input("Enter your selection from the list above:")'
+                f'{widget_details["func_name"]} = input("Enter your selection from the list above:")'
             ]
         elif widget_details['type'] in ["SelectionRangeSlider", ]:
             replacement = [
@@ -550,7 +594,7 @@ class ASFNotebookTest:
                 "    widget_max = datetime.strptime(widget_max, '%Y%m%d')",
                 'except ValueError:',
                 '    pass',
-                f'{widget_name} = [widget_min, widget_max]'
+                f'{widget_details["func_name"]} = [widget_min, widget_max]'
             ]
         elif widget_details['type'] in ["SelectMultiple", ]:
             replacement = [
@@ -558,29 +602,19 @@ class ASFNotebookTest:
                 'for item in widget_container:',
                 '    print(item)',
                 'widget_input = None',
-                f'{widget_name}  = []',
+                f'{widget_details["func_name"]}  = []',
                 'print("Select one or many elements")',
                 'while True:',
                 '    widget_input = input("Add an element or hit enter to continue: ")',
                 '    if widget_input == "":',
                 '        break',
-                f'    {widget_name}.append(widget_input)'
+                f'    {widget_details["func_name"]}.append(widget_input)'
             ]
         else:
             raise WidgetTypeNotHandled
         for line in replacement:
             code.append(line)
         return code
-
-    def replace_widget_dot_value(self, widget_name: str):
-        """
-        widget_name: the variable name of a widget
-        void: replaces all occurrences of widget_name.value in self.code_dict
-              with widget_name
-        """
-        value = f"{widget_name}.value"
-        for code_cell_index in self.code_dict:
-            self.code_dict[code_cell_index] = self.code_dict[code_cell_index].replace(value, widget_name)
 
     def notebook_to_script(self, stop_cell: int = None):
         """
@@ -590,19 +624,20 @@ class ASFNotebookTest:
         self.code_dict = self.assemble_code(stop_cell=stop_cell, include_tests=True)
         script = ["#!/usr/bin/env python3\n\n"]
         for code_cell_index in self.code_dict:
-            code_cell_lines = self.code_dict[code_cell_index].split("\n")
-            for line in code_cell_lines:
-                widget_details = self.get_widget_details(line)
-                if len(widget_details) > 0:
-                    widget_name = code_cell_lines[len(code_cell_lines) - 1]
-                    code_cell_lines.remove(widget_name)
-                    widget_name = widget_name.replace(" ", "")
-                    self.replace_widget_dot_value(widget_name)
-                    replacement = self.widget_replacement_code(widget_details, widget_name)
-                    for rep_line in replacement:
-                        script.append(rep_line)
-                else:
-                    script.append(line)
+            print(f"CODE FOR WIDGET_DETAILS:{self.code_dict[code_cell_index]}") ###########################
+            widget_details = self.get_widget_details(self.code_dict[code_cell_index])
+            if len(widget_details) > 0:
+                
+                cell_lines = self.code_dict[code_cell_index].split('\n')
+                for i, line in enumerate(cell_lines):
+                    if widget_details['func_name'] in line:
+                        for replacement_line in self.widget_replacement_code(widget_details):
+                            script.append(f"{replacement_line}\n")
+                        print(f"FUNCTION CALLING WIDGET LINE: {line}") ####################
+                    else:
+                        script.append(line)
+            else:
+                script.append(self.code_dict[code_cell_index])
         file_path = f"{self.notebook_path.split('.')[0]}.py"
         print(f"file_path: {file_path}")
         try:
