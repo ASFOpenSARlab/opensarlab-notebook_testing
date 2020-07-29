@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from getpass import getpass
+import shutil
+
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
 
@@ -10,6 +12,18 @@ from asf_jupyter_test import std_out_io
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise1-ReadAnalyzeSARStack.ipynb"
 log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
 test = ASFNotebookTest(notebook_pth, log_pth)
+
+# Change data path for testing
+_to_replace = ("analysis_dir = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\"")
+test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
+_replacement = f"analysis_dir = \"{test_data_path}\""
+test.replace_line("analysis_dir = f\"/home/jovyan/notebooks", _to_replace, _replacement)
+
+# Erase data directory if already present
+try:
+   shutil.rmtree(test_data_path)
+except:
+   pass
 
 ######### TESTS ###########
 

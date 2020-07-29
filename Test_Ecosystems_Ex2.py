@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from getpass import getpass
+import shutil
+
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
 
@@ -14,10 +16,16 @@ log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = ("path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/S1-MadreDeDios\"")
-_replacement = ("path = \"/home/jovyan/notebooks/notebook_testing_dev/"
-                "S1-MadreDeDios\"")
+_to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/S1-MadreDeDios\""
+test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/S1-MadreDeDios"
+_replacement = f"path = \"{test_data_path}\""
 test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
+
+# Erase data directory if already present
+try:
+   shutil.rmtree(test_data_path)
+except:
+   pass
 
 ######### TESTS ###########
 
@@ -343,7 +351,7 @@ for cell_index in all_the_code:
         try:
             exec(all_the_code[cell_index])
         except Exception as e:
-            test.log_test('e', e) 
+            test.log_test('e', f"cell {cell_index}, {e}")
     print(f"Output: {stdio.getvalue()}")
     test.log_info(f"Output: {stdio.getvalue()}")
     
