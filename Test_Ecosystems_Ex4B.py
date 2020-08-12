@@ -6,17 +6,17 @@ import shutil
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
 
-
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Ecosystems/Exercise4B-SARTimeSeriesChangeDetection.ipynb"
+notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Ecosystems/"
+                "Exercise4B-Change_Detection_Amplitude_Time_Series_Example.ipynb")
 log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_Ex4B_SARTimeSeriesChangeDetection\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Ex4B_SARTimeSeriesChangeDetection"
+_to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_Ex4B-Change_Detection_Amplitude_Time_Series_Example\""
+test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Ex4B-Change_Detection_Amplitude_Time_Series_Example"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
