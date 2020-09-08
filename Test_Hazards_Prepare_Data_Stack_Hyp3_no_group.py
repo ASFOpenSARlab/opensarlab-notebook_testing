@@ -8,7 +8,7 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Master/Prepare_Data_Stack_Hyp3.ipynb"
+notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Prepare_Data_Stack_Hyp3.ipynb"
 log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
