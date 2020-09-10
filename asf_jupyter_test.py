@@ -175,6 +175,8 @@ class ASFNotebookTest:
         self.info_logger = setup_logger('info_logger', f"{log_path}/{os.path.basename(notebook_path).split('.')[0]}.info.log")
         self.test_logger = setup_logger('test_logger', f"{log_path}/{os.path.basename(notebook_path).split('.')[0]}.test.log")
         self.code_dict = {}
+        self.failed_count = 0
+        self.exception_count = 0
 
     @staticmethod
     def get_loop_var_names(cell_code: list) -> list:
@@ -255,7 +257,10 @@ class ASFNotebookTest:
             for line in self.cells[i].contents:
                 if string in line:
                     results.append(i)
-        return results
+        if len(results) > 0:
+            return results
+        else:
+            raise SearchFailedException(f"'{string}' not found")
 
     @staticmethod
     def get_cells(notebook_path: str):
@@ -278,9 +283,11 @@ class ASFNotebookTest:
         if passed == 'p':
             self.test_logger.info(f"PASSED: {message}")
         elif passed == 'f':
-            self.test_logger.info(f"FAILED: {message}")
+            self.test_logger.info(f"**FAILED**: {message}")
+            self.failed_count += 1
         elif passed == 'e':
             self.test_logger.info(f"EXCEPTION: {message}")
+            self.exception_count += 1
         else:
             raise ValueError("Valid values for passed are p (passed), f (failed), and e (exception)")
 
@@ -328,11 +335,11 @@ class ASFNotebookTest:
 
         updates self.test_cells dict with {target cell index: test_code}
         """
-        index = self.find(search_str)[0]
+        cell_index = self.find(search_str)[0]          
         try:
-            self.test_cells.update({index: f"{self.test_cells[index]}\n{test_code}"})
+            self.test_cells.update({cell_index: f"{self.test_cells[cell_index]}\n{test_code}"})
         except KeyError:
-            self.test_cells.update({index: test_code})
+            self.test_cells.update({cell_index: test_code})
 
     @staticmethod
     def magic_to_subprocess(code: str) -> str:
@@ -342,7 +349,6 @@ class ASFNotebookTest:
                  a subprocess.call command 
         """
         space_count = count_leading_whitespaces(code)
-        print(f"code: {code}")
         code = code[space_count + 1:]  # drop the ! magic char
         spaces = space_count * " "
         code_lst = code.split(' ')
