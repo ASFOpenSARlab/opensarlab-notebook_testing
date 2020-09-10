@@ -11,12 +11,12 @@ from asf_jupyter_test import std_out_io
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Hazards/"
        "Exercise3A-ExploreSARTimeSeriesFlood.ipynb")
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/{name}"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line("path = f\"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
 
@@ -40,7 +40,7 @@ if os.path.exists(f"{path}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test("!aws s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the tarball
 test_tarball_extraction = """
@@ -58,7 +58,7 @@ if os.path.exists(f"{os.getcwd()}/datesflood_VV.csv"):
 else:
     test.log_test('f', f"{os.getcwd()}/datesflood_VV.csv NOT found")
 """
-test.add_test_cell("!tar -xvzf {name}.tar.gz", test_tarball_extraction)
+test.add_test("!tar -xvzf {name}.tar.gz", test_tarball_extraction)
 
 # Confirm len(dates) == 17
 test_dates = """
@@ -67,7 +67,7 @@ if len(dates) == 17:
 else:
     test.log_test('f', f"len(dates) == {len(dates)}, NOT 17")
 """
-test.add_test_cell("dates = get_dates(tiff_paths)", test_dates)
+test.add_test("dates = get_dates(tiff_paths)", test_dates)
 
 # Confirm rasterstack type and shape
 test_rasterstack = """
@@ -80,7 +80,7 @@ if rasterstack.shape == (17, 1033, 1483):
 else:
     test.log_test('f', f"rasterstack.shape == {rasterstack.shape}, NOT (17, 1033, 1483)")
 """
-test.add_test_cell("rasterstack = img.ReadAsArray()", test_rasterstack)
+test.add_test("rasterstack = img.ReadAsArray()", test_rasterstack)
 
 # Confirm temporal min type and shape
 test_temporal_min = """
@@ -93,7 +93,7 @@ if temporal_min.shape == (1033, 1483):
 else:
     test.log_test('f', f"temporal_min.shape == {temporal_min.shape}, NOT (1033, 1483)")
 """
-test.add_test_cell("temporal_min = np.nanmin(convert", test_temporal_min)
+test.add_test("temporal_min = np.nanmin(convert", test_temporal_min)
 
 # Check geotrans, xsize, ysiz, bands, and projstring
 test_img_stats = """
@@ -118,7 +118,7 @@ if projstring == '32717':
 else:
     test.log_test('f', f"projstring == {repr(projstring)}, NOT '32717'")
 """
-test.add_test_cell("geotrans = img_handle.GetGeoTransform()", test_img_stats)
+test.add_test("geotrans = img_handle.GetGeoTransform()", test_img_stats)
     
 # Confirm creation of RCSTimeSeries--1.842° -79.627°.png
 test_rcstimeseries_png = """
@@ -127,7 +127,7 @@ if os.path.exists(figname):
 else:
     test.log_test('f', f"{figname} NOT found")
 """
-test.add_test_cell("plt.savefig(figname,", test_rcstimeseries_png)
+test.add_test("plt.savefig(figname,", test_rcstimeseries_png)
 
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########

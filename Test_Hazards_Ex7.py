@@ -11,7 +11,7 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise7-PairwiseInSARWithSNAP.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Input tester's Earthdata creds
@@ -24,7 +24,7 @@ test.replace_cell("login = EarthdataLogin()",
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Hazards/data_CBCInSAR\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_CBCInSAR"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_CBCInSAR"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -48,7 +48,7 @@ if os.path.exists(f"{path}/S1A_IW_SLC__1SDV_20170401T114956_20170401T115026_0159
 else:
     test.log_test('f', f"{path}/S1A_IW_SLC__1SDV_20170401T114956_20170401T115026_015950_01A4D5_C699.zip NOT found")
 """
-test.add_test_cell('cmd = get_wget_cmd(pre_event_info["downloadUrl"], login)', 
+test.add_test('cmd = get_wget_cmd(pre_event_info["downloadUrl"], login)', 
                    test_download)
 
 # Confirm successful topsar_split of pre-event zip
@@ -62,7 +62,7 @@ if os.path.exists(f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_0157
 else:
     test.log_test('f', f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_TS.dim NOT found")
 """
-test.add_test_cell("pre_event_split = topsar_split(pre_event, 'IW1', os.getcwd(), '')",
+test.add_test("pre_event_split = topsar_split(pre_event, 'IW1', os.getcwd(), '')",
                    test_pre_event_topsar_split)
 
 # Confirm successful topsar_split of post-event zip
@@ -76,7 +76,7 @@ if os.path.exists(f"{path}/S1A_IW_SLC__1SDV_20170401T114956_20170401T115026_0159
 else:
     test.log_test('f', f"{path}/S1A_IW_SLC__1SDV_20170401T114956_20170401T115026_015950_01A4D5_C699_TS.dim NOT found")
 """
-test.add_test_cell("post_event_split = topsar_split(post_event, 'IW1', os.getcwd(), '')",
+test.add_test("post_event_split = topsar_split(post_event, 'IW1', os.getcwd(), '')",
                    test_post_event_topsar_split)
 
 # Confirm successful apply_orbit call on pre-event data
@@ -90,7 +90,7 @@ if os.path.exists(f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_0157
 else:
     test.log_test('f', f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_TS_OB.dim NOT found")
 """
-test.add_test_cell("pre_event_orbit_output = apply_orbit(pre_event_split, os.getcwd())",
+test.add_test("pre_event_orbit_output = apply_orbit(pre_event_split, os.getcwd())",
                    test_pre_event_apply_orbit)
 
 # Confirm successful apply_orbit call on post-event data
@@ -104,7 +104,7 @@ if os.path.exists(f"{path}/S1A_IW_SLC__1SDV_20170401T114956_20170401T115026_0159
 else:
     test.log_test('f', f"{path}/S1A_IW_SLC__1SDV_20170401T114956_20170401T115026_015950_01A4D5_C699_TS_OB.dim NOT found")
 """
-test.add_test_cell("post_event_orbit_output = apply_orbit(post_event_split, os.getcwd())",
+test.add_test("post_event_orbit_output = apply_orbit(post_event_split, os.getcwd())",
                    test_post_event_apply_orbit)
 
 # Confirm successful back geocoding of pre and post event orbit output
@@ -118,7 +118,7 @@ if os.path.exists(f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_0157
 else:
     test.log_test('f', f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_TS_OB_BG.dim NOT found")
 """
-test.add_test_cell("back_geocoded_output = back_geocoding(pre_event_orbit_output, post_ev",
+test.add_test("back_geocoded_output = back_geocoding(pre_event_orbit_output, post_ev",
              test_back_geocoding)
 
 # Confirm successful co-registration of images with ESD
@@ -136,7 +136,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD.data NOT found"))
 """
-test.add_test_cell("esd_output = apply_ESD(back_geocoded_output, os.getcwd())",
+test.add_test("esd_output = apply_ESD(back_geocoded_output, os.getcwd())",
              test_apply_esd)
 
 # Confirm successful creation of interferogram
@@ -154,7 +154,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT.data NOT found"))
 """
-test.add_test_cell("interferogram_output = create_interferogram(esd_output, os.getcwd())",
+test.add_test("interferogram_output = create_interferogram(esd_output, os.getcwd())",
              test_create_interferogram)
 
 # Confirm successful call of tosar_deburst on interferogram
@@ -172,7 +172,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB.data NOT found"))
 """
-test.add_test_cell("topsar_deburst_output = topsar_deburst(interferogram_output, os.getcwd())",
+test.add_test("topsar_deburst_output = topsar_deburst(interferogram_output, os.getcwd())",
              test_topsar_deburst)
 
 # Confirm successful call of topo_phase_remove on deburst interferogram
@@ -192,7 +192,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB_Topo.data NOT found"))
 """
-test.add_test_cell("topo_phase_remove_output = topo_phase_remove(topsar_deburst_output,os.getcwd(),'')",
+test.add_test("topo_phase_remove_output = topo_phase_remove(topsar_deburst_output,os.getcwd(),'')",
              test_topo_phase_remove)
 
 # Confirm successful call of multi_look on deburst interferogram with phase removed
@@ -212,7 +212,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB_Topo_ML.data NOT found"))
 """
-test.add_test_cell("multi_look_output = multi_look(topo_phase_remove_output, os.getcwd())",
+test.add_test("multi_look_output = multi_look(topo_phase_remove_output, os.getcwd())",
              test_multi_look)
 
 # Confirm successful call of goldstein_filter on multilooked data
@@ -232,7 +232,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB_Topo_ML_GF.data NOT found"))
 """
-test.add_test_cell("goldstein_filter_output = goldstein_filter(multi_look_output, os.getcwd())",
+test.add_test("goldstein_filter_output = goldstein_filter(multi_look_output, os.getcwd())",
              test_goldstein_filter)
 
 # Confirm successful phase unwrapping
@@ -259,7 +259,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB_Topo_ML_UNW.data NOT found"))
 """
-test.add_test_cell("phase_unwrap_output = phase_unwrap(multi_look_output, os.getcwd())",
+test.add_test("phase_unwrap_output = phase_unwrap(multi_look_output, os.getcwd())",
              test_phase_unwrap)
 
 # Confirm successful terrain correction on phase filtered data
@@ -279,7 +279,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB_Topo_ML_GF_TC.data NOT found"))
 """
-test.add_test_cell("filtered_terrain_correction_output = terrain_correction(goldstein_filter_output",
+test.add_test("filtered_terrain_correction_output = terrain_correction(goldstein_filter_output",
              test_terrain_correction_phase_filtered)
              
 # Confirm successful terrain correction on unfiltered data
@@ -299,7 +299,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_"
                         f"019FA4_097A_TS_OB_BG_ESD_INT_DB_Topo_ML_TC.data NOT found"))
 """
-test.add_test_cell("unfiltered_terrain_correction_output = terrain_correction(multi_look_output",
+test.add_test("unfiltered_terrain_correction_output = terrain_correction(multi_look_output",
              test_terrain_correction_unfiltered)
 
 # Confirm creation of interferogram from phase filtered, terrain corrected data
@@ -319,7 +319,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_GF_TC.data/phase.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data',
                   test_GF_TC_interferogram)
 
 # Confirm creation of interferogram from unfiltered, terrain corrected data
@@ -339,7 +339,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_TC.data/phase.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data',
                   test_Topo_ML_TC_interferogram)
 
 # Confirm creation of phase filtered, terrain corrected geotiffs
@@ -352,7 +352,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_GF_TC.data/coh-{re.split('/',os.getcwd())[-1]}.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data;gdal_translate',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data;gdal_translate',
                    test_GF_TC_geotiff)
 
 # Confirm creation of multi-looked, terrain corrected geotiffs
@@ -365,7 +365,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_TC.data/coh-unfiltered-data_CBCInSAR.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data;gdal_translate',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data;gdal_translate',
                    test_ML_TC_geotiff)
     
 # Confirm renaming of phase filtered, terrain corrected phase.tif
@@ -378,7 +378,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_GF_TC.data/phase-data_CBCInSAR.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data;mv phase.tif',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data;mv phase.tif',
                    test_phase_data_CBCInSAR_tif)
 
 # Confirm renaming of multi-looked, terrain corrected phase.tif
@@ -391,7 +391,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_TC.data/phase-unfiltered-data_CBCInSAR.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data;mv phase.tif',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data;mv phase.tif',
                    test_unfiltered_phase_data_CBCInSAR_tif)
 
 # Confirm renaming of phase filtered, terrain corrected amplitude.tif
@@ -404,7 +404,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_GF_TC.data/amp-data_CBCInSAR.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data;mv amplitude.tif',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*GF_TC.data;mv amplitude.tif',
                    test_amp_data_CBCInSAR_tif)
 
 # Confirm renaming of multi-looked, terrain corrected amplitude.tif
@@ -417,7 +417,7 @@ else:
     test.log_test('f', (f"{path}/S1A_IW_SLC__1SDV_20170320T114956_20170320T115025_015775_019FA4_097A_"
                    f"TS_OB_BG_ESD_INT_DB_Topo_ML_TC.data/amplitude-unfiltered-data_CBCInSAR.tif NOT found"))
 """
-test.add_test_cell('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data;mv amplitude.tif',
+test.add_test('cmd = f"cd {os.getcwd()}/{pre_event_base_granule}*Topo_ML_TC.data;mv amplitude.tif',
                    test_unfiltered_amp_data_CBCInSAR_tif)
 
 # Confirm creation of tifs directory
@@ -427,7 +427,7 @@ if os.path.exists(f"{path}/{tifs_path}"):
 else:
     test.log_test('f', f"{path}/{tifs_path} NOT found")
 """
-test.add_test_cell("tifs_path = 'tifs'", test_tif_dir)
+test.add_test("tifs_path = 'tifs'", test_tif_dir)
 
 # Confirm all tifs moved to tifs directory
 test_move_tifs = """
@@ -442,7 +442,7 @@ if set(glob.glob(f"{path}/{tifs_path}/*.tif")) == test_tifs:
 else:
     test.log_test('f', f"tifs NOT moved to {path}/{tifs_path}")
 """
-test.add_test_cell("!mv */*.tif ./tifs", test_move_tifs)
+test.add_test("!mv */*.tif ./tifs", test_move_tifs)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 

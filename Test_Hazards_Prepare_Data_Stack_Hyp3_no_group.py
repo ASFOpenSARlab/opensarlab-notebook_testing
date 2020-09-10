@@ -9,12 +9,12 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Prepare_Data_Stack_Hyp3.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 replace_data_dir = """
-data_dir = "/home/jovyan/notebooks/notebook_testing_dev/data_Test_Prepare_Data_Stack_Hyp3"
+data_dir = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Prepare_Data_Stack_Hyp3"
 try:
     shutil.rmtree(data_dir)
 except FileNotFoundError:
@@ -91,7 +91,7 @@ if tiff_paths == test_tiff_pths:
 else:
     test.log_test('f', f"tiff_paths == {tiff_paths}, NOT {test_tiff_pths}")
 """
-test.add_test_cell('tiff_pth = f"{rtc_path}/*/*{polarization[0]}*.tif*"',
+test.add_test('tiff_pth = f"{rtc_path}/*/*{polarization[0]}*.tif*"',
                    test_tiff_paths_1)
                    
 
@@ -110,7 +110,7 @@ if utm_types == test_types:
 else:
     test.log_test('f', f"utm_types == {utm_types}, NOT {test_types}")
 """
-test.add_test_cell("utm_zones = []", test_utm)
+test.add_test("utm_zones = []", test_utm)
 
 # Confirm predominant_utm == '32646'
 test_predominant_utm = """
@@ -119,7 +119,7 @@ if predominant_utm == '32646':
 else:
     test.log_test('f', f"predominant_utm == {predominant_utm}, NOT '32646'")           
 """
-test.add_test_cell("predominant_utm = utm_unique[a][0]", test_predominant_utm)
+test.add_test("predominant_utm = utm_unique[a][0]", test_predominant_utm)
     
 # Confirm creaation of reprojected tiffs
 test_reprojection = """
@@ -132,7 +132,7 @@ for test_p in test_tiff_paths:
     else:
         test.log_test('f', f"Missing Reprojected File: {test_p}")
 """
-test.add_test_cell("reproject_indicies = [i for", test_reprojection)
+test.add_test("reproject_indicies = [i for", test_reprojection)
 
 # Confirm dates hold correct values
 test_dates = """
@@ -143,7 +143,7 @@ if dates == test_dates:
 else:
     test.log_test('f', f"dates == {dates}, NOT {test_dates}")
 """
-test.add_test_cell("dates = get_dates(tiff_paths)", test_dates)
+test.add_test("dates = get_dates(tiff_paths)", test_dates)
 
 # Confirm dup_date_batches hold correct values
 test_dup_date_batches = """
@@ -154,7 +154,7 @@ if dup_date_batches == test_dup_dates_btchs:
 else:
     test.log_test('p', f"dup_date_batches == {dup_date_batches}, NOT {test_dup_dates_btchs}")
 """
-test.add_test_cell("for d in dup_date_batches:", test_dup_date_batches)
+test.add_test("for d in dup_date_batches:", test_dup_date_batches)
 
 # Confirm that duplicate dates for each polarization were merged
 test.replace_line('print(f"Duplicate dates still present!")',
@@ -183,7 +183,7 @@ if tiff_paths == test_merged_paths:
 else:
     test.log_test('f', f"tiff_paths == {tiff_paths}, NOT {test_merged_paths}")
 """
-test.add_test_cell("if len(dates) != len(set(dates)):", test_merged_tiffs)
+test.add_test("if len(dates) != len(set(dates)):", test_merged_tiffs)
      
 
 

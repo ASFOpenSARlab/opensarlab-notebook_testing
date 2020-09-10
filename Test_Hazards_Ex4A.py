@@ -11,12 +11,12 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise4A-SARChangeDetectionMethods.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = f\"{os.getcwd()}/{name}\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/{name}"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -36,7 +36,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test("!aws s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the tarball
 test_tarball_extraction = """
@@ -64,7 +64,7 @@ if os.path.exists(f"{os.getcwd()}/datesfuego_VH.csv"):
 else:
     test.log_test('f', f"{os.getcwd()}/datesfuego_VH.csv NOT found")
 """
-test.add_test_cell("!tar -xvzf {name}.tar.gz", test_tarball_extraction)
+test.add_test("!tar -xvzf {name}.tar.gz", test_tarball_extraction)
 
 # Confirm creation of dtype and size of tindex
 test_tindex = """
@@ -77,7 +77,7 @@ if tindex.dtype == 'datetime64[ns]':
 else:
     test.log_test('p', f"tindex.dtype == {repr(tindex.dtype)}, NOT 'datetime64[ns]'")
 """
-test.add_test_cell("tindex = pd.DatetimeIndex(o", test_tindex)
+test.add_test("tindex = pd.DatetimeIndex(o", test_tindex)
     
 # Confirm rasterstack type and shape
 test_rasterstack = """
@@ -90,7 +90,7 @@ if rasterstack.shape == (30, 475, 544):
 else:
     test.log_test('f', f"rasterstack.shape == {rasterstack.shape}, NOT (30, 475, 544)")
 """
-test.add_test_cell("rasterstack = img.ReadAsArray()", test_rasterstack)
+test.add_test("rasterstack = img.ReadAsArray()", test_rasterstack)
 
 # Confirm creation of plots_and_animations directory
 test_product_path = """
@@ -99,7 +99,7 @@ if os.path.exists(product_path):
 else:
     test.log_test('f', f"{product_path} NOT found")
 """
-test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+test.add_test("product_path = 'plots_and_animations'", test_product_path)
 
 # Confirm creation of time series animation
 test_ts_animation = """
@@ -108,7 +108,7 @@ if os.path.exists(os.path.join(product_path, f'animation_{labeldB}.gif')):
 else:
     test.log_test('f', f"{os.path.join(product_path, f'animation_{labeldB}.gif')} NOT found")
 """
-test.add_test_cell("ani.save(os.path.join(product_path", test_ts_animation)
+test.add_test("ani.save(os.path.join(product_path", test_ts_animation)
 
 # Confirm metric_keys
 
@@ -123,7 +123,7 @@ else:
                         ", 'median', 'p5', 'prange', 'range', 'CV'}"))
     
 """
-test.add_test_cell("metrics.keys()", test_metrics_keys)
+test.add_test("metrics.keys()", test_metrics_keys)
 
 # Confirm creation of prange histogram
 test_prange_histogram = """
@@ -132,7 +132,7 @@ if os.path.exists(os.path.join(product_path, f'prange_{labeldB}_histogram.png'))
 else:
     test.log_test('f', f"{os.path.join(product_path, f'prange_{labeldB}_histogram.png')} NOT found")
 """
-test.add_test_cell("plot_histogram_cdf(metric='prange')", test_prange_histogram)
+test.add_test("plot_histogram_cdf(metric='prange')", test_prange_histogram)
 
 # Confirm creation of changes_prange_dB.png
 test_changes_prange_db_png = """
@@ -141,7 +141,7 @@ if os.path.exists(f"{product_path}/changes_prange_dB.png"):
 else:
     test.log_test('f', f"{product_path}/changes_prange_dB.png NOT found")
 """
-test.add_test_cell("metric = 'prange'", test_changes_prange_db_png)
+test.add_test("metric = 'prange'", test_changes_prange_db_png)
 
 # Confirm creation of std_dB_histogram.png
 test_std_dB_histogram_png = """ 
@@ -150,7 +150,7 @@ if os.path.exists(f"{product_path}/std_dB_histogram.png"):
 else:
     test.log_test('f', f"{product_path}/std_dB_histogram.png NOT found")
 """
-test.add_test_cell("plot_histogram_cdf(metric='std')", test_std_dB_histogram_png)
+test.add_test("plot_histogram_cdf(metric='std')", test_std_dB_histogram_png)
 
 # Confirm creation of changes_std_dB.png
 test_changes_std_dB_png = """ 
@@ -159,7 +159,7 @@ if os.path.exists(f"{product_path}/changes_std_dB.png"):
 else:
     test.log_test('f', f"{product_path}/changes_std_dB.png NOT found")
 """
-test.add_test_cell("masks[metric] = plot_threshold_classifier(metric=metric)", test_changes_std_dB_png)
+test.add_test("masks[metric] = plot_threshold_classifier(metric=metric)", test_changes_std_dB_png)
 
 # Confirm creation of CV_dB_histogram.png
 test_CV_dB_histogram_png = """ 
@@ -168,7 +168,7 @@ if os.path.exists(f"{product_path}/CV_dB_histogram.png"):
 else:
     test.log_test('f', f"{product_path}/CV_dB_histogram.png NOT found")
 """
-test.add_test_cell("plot_histogram_cdf(metric='CV')", test_CV_dB_histogram_png)
+test.add_test("plot_histogram_cdf(metric='CV')", test_CV_dB_histogram_png)
 
 # Confirm creation of logratio_2018-05-27_2018-05-27.png
 test_logratio_png = """ 
@@ -177,7 +177,7 @@ if os.path.exists(os.path.join(product_path, f'{logratiolabel}.png')):
 else:
     test.log_test('f', f"{os.path.join(product_path, f'{logratiolabel}.png')} NOT found")
 """
-test.add_test_cell("plt.savefig(os.path.join(product_path, f'{logratiolabel}.png')", test_logratio_png)
+test.add_test("plt.savefig(os.path.join(product_path, f'{logratiolabel}.png')", test_logratio_png)
 
 # Confirm geotrans == [724170.0, 30.0, 0.0, 1602960.0, 0.0, -30.0]
 test_geotrans = """
@@ -186,7 +186,7 @@ if geotrans == [724170.0, 30.0, 0.0, 1602960.0, 0.0, -30.0]:
 else:
     test.log_test('f', f"geotrans == {geotrans}, not [724170.0, 30.0, 0.0, 1602960.0, 0.0, -30.0]")
 """
-test.add_test_cell("geotrans = list(img.GetGeoTransform())", test_geotrans)
+test.add_test("geotrans = list(img.GetGeoTransform())", test_geotrans)
 
 # Confirm creation of fuego_tsmetrics directory
 test_tsmetrics_dir = """
@@ -195,7 +195,7 @@ if os.path.exists("fuego_tsmetrics"):
 else:
     test.log_test('f', "fuego_tsmetrics directory NOT found")
 """
-test.add_test_cell("dirname = f'{name}_tsmetrics'", test_tsmetrics_dir)
+test.add_test("dirname = f'{name}_tsmetrics'", test_tsmetrics_dir)
 
 
 # Confirm creation of metric geotiffs
@@ -207,7 +207,7 @@ for metric in metrics:
     else:
         test.log_test('f', f"{name_} NOT found")
 """
-test.add_test_cell("name_ = os.path.join(dirname, f'{metric}_{labeldB}.tif')", test_metric_geotiffs)
+test.add_test("name_ = os.path.join(dirname, f'{metric}_{labeldB}.tif')", test_metric_geotiffs)
 
 # Confirm creation of ts_metrics_dB.vrt
 test_ts_metrics_dB_vrt = """
@@ -216,7 +216,7 @@ if os.path.exists(f"{dirname}_{labeldB}.vrt"):
 else:
     test.log_test('f', f"{dirname}_{labeldB}.vrt NOT found")
 """
-test.add_test_cell("cmd='gdalbuildvrt -separate -overwrite -vrtnodata", test_ts_metrics_dB_vrt)
+test.add_test("cmd='gdalbuildvrt -separate -overwrite -vrtnodata", test_ts_metrics_dB_vrt)
 
 # Confirm creation of geotiffs based on 4 change detection threshold masks
 test_threshold_tifs = """
@@ -227,7 +227,7 @@ for metric in masks:
     else:
         test.log_test('f', f"{fnmetric} NOT found")
 """
-test.add_test_cell("fnmetric = os.path.join(dirname, f'{name}_", test_threshold_tifs)
+test.add_test("fnmetric = os.path.join(dirname, f'{name}_", test_threshold_tifs)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 

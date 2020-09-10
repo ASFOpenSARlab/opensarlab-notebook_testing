@@ -10,12 +10,12 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Ecosystems/Exercise1-ExploreSARTimeSeries_Example.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_time_series_example\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_time_series_example"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_time_series_example"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -34,7 +34,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series_path}"):
 else:
     test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
 """
-test.add_test_cell("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
+test.add_test("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
 
 # Confirm we have extracted 828 files from the zip
 test_extract = """
@@ -47,7 +47,7 @@ if test_zip_extract_length == 828:
 else:
     test.log_test('f', f"{test_zip_extract_length} files were extracted from the zip, NOT 828")              
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series_path)", test_extract)
+test.add_test("asf_unzip(os.getcwd(), time_series_path)", test_extract)
 
 # Confirm we are in datadirectoy
 test_datadirectory = """
@@ -56,7 +56,7 @@ if os.getcwd() == f"{path}/{datadirectory}":
 else:
     test.log_test('f', f"os.getcwd() == {os.getcwd()}, NOT {path}/{datadirectory}")
 """
-test.add_test_cell("os.chdir(datadirectory)", test_datadirectory)
+test.add_test("os.chdir(datadirectory)", test_datadirectory)
 
 # Confirm tindex has dtype = datetime64[ns], freq = None, and length = 70
 test_tindex = """
@@ -73,7 +73,7 @@ if len(tindex) == 70:
 else:
     test.log_test('f', f"len(tindex) == {len(tindex)}, NOT 70")    
 """
-test.add_test_cell("tindex = pd.DatetimeIndex(dates)", test_tindex)
+test.add_test("tindex = pd.DatetimeIndex(dates)", test_tindex)
 
 # Confirm S32644X696260Y3052060sS1_D_vv_0092_mtfil.vrt is a vrt, has 70 bands, 1547 pixels, and 1270 lines
 test_img = """
@@ -95,7 +95,7 @@ if img.RasterYSize == 1270:
 else:
     test.log_test('f', f"img.RasterYSize == {img.RasterYSize}, NOT 1270")
 """
-test.add_test_cell("img = gdal.Open(imagefile)", test_img)
+test.add_test("img = gdal.Open(imagefile)", test_img)
 
 # Confirm caldB.shape == (70, 600, 600)
 test_caldB = """
@@ -104,7 +104,7 @@ if caldB.shape == (70, 600, 600):
 else:
     test.log_test('f', f"caldB.shape == {caldB.shape}, NOT (70, 600, 600)")
 """
-test.add_test_cell("caldB = 20*np.log10(rasterstack) - 83", test_caldB)
+test.add_test("caldB = 20*np.log10(rasterstack) - 83", test_caldB)
 
 # Confirm calPwr.shape and calAmp.shape == (70, 600, 600)
 test_calPwr_calAmp = """
@@ -117,7 +117,7 @@ if calAmp.shape == (70, 600, 600):
 else:
     test.log_test('f', f"calAmp.shape == {calAmp.shape}, NOT (70, 600, 600)")
 """
-test.add_test_cell("calAmp = np.sqrt(calPwr)", test_calPwr_calAmp)
+test.add_test("calAmp = np.sqrt(calPwr)", test_calPwr_calAmp)
 
 # Confirm S32644X696260Y3052060sS1_D_vh_0092_mtfil.vrt is a vrt, has 38 bands, 1547 pixels, and 1270 lines
 test_img_cross = """
@@ -139,7 +139,7 @@ if img_cross.RasterYSize == 1270:
 else:
     test.log_test('f', f"img_cross.RasterYSize == {img_cross.RasterYSize}, NOT 1270")
 """
-test.add_test_cell("img_cross = gdal.Open(imagefile_cross)", test_img_cross)
+test.add_test("img_cross = gdal.Open(imagefile_cross)", test_img_cross)
 
 # Confirm creation of product_path
 test_product_path = """ 
@@ -148,7 +148,7 @@ if os.path.exists(f"{path}/{product_path}"):
 else:
     test.log_test('f', f"{path}/{product_path} NOT found")
 """
-test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+test.add_test("product_path = 'plots_and_animations'", test_product_path)
 
 # Confirm creation of animation.gif
 test_animation = """
@@ -157,7 +157,7 @@ if os.path.exists(f"{path}/{product_path}/animation.gif"):
 else:
     test.log_test('f', f"{path}/{product_path}/animation.gif NOT found")
 """
-test.add_test_cell("ani.save('animation.gif', writer='pillow', fps=2)", test_animation)
+test.add_test("ani.save('animation.gif', writer='pillow', fps=2)", test_animation)
 
 # Confirm rs_means_pwr.shape == (70,)
 test_rs_means_pwr = """
@@ -166,7 +166,7 @@ if rs_means_pwr.shape == (70,):
 else:
     test.log_test('f', f"rs_means_pwr.shape == {rs_means_pwr.shape}, NOT (70,)")
 """
-test.add_test_cell("rs_means_pwr.shape", test_rs_means_pwr)
+test.add_test("rs_means_pwr.shape", test_rs_means_pwr)
 
 # Confirm creation of time_series_means
 test_time_series_means = """ 
@@ -175,7 +175,7 @@ if os.path.exists(f"{path}/{product_path}/time_series_means.png"):
 else:
     test.log_test('f', f"{path}/{product_path}/time_series_means.png NOT found")
 """
-test.add_test_cell("plt.savefig('time_series_means'", test_time_series_means)
+test.add_test("plt.savefig('time_series_means'", test_time_series_means)
                    
 # Confirm creation of animation_histogram.gif
 test_animation_histogram = """ 
@@ -184,7 +184,7 @@ if os.path.exists(f"{path}/{product_path}/animation_histogram.gif"):
 else:
     test.log_test('f', f"{path}/{product_path}/animation_histogram.gif NOT found")
 """
-test.add_test_cell("ani.save('animation_histogram.gif'", test_animation_histogram)
+test.add_test("ani.save('animation_histogram.gif'", test_animation_histogram)
                    
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########

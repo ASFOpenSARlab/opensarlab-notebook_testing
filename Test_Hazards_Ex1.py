@@ -10,12 +10,12 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise1-ReadAnalyzeSARStack.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = ("analysis_dir = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\"")
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/{name}"
 _replacement = f"analysis_dir = \"{test_data_path}\""
 test.replace_line("analysis_dir = f\"/home/jovyan/notebooks", _to_replace, _replacement)
 
@@ -34,7 +34,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series_path}"):
 else:
     test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
 """
-test.add_test_cell("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
+test.add_test("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
 
 # Check that 152 tiffs, 2 csvs, and 2 vrts were extracted from the tarball
 test_extract = """
@@ -56,7 +56,7 @@ else:
     test.log_test('f', f"Expected 2 csvs and vrts. Found {test_csv_len} csv files and {test_vrt_len} vrt files.")    
 
 """
-test.add_test_cell("!tar -xvzf tropical.tar.gz", test_extract)
+test.add_test("!tar -xvzf tropical.tar.gz", test_extract)
 
 # Check that a gdal dataset has been opened for a vrt in each polarization and then stored in a dictionary
 test_vrt_dict = """
@@ -70,7 +70,7 @@ for test_polar in polarizations:
             test.log_test('f', f"Invalid key '{test_polar}'")
 
 """
-test.add_test_cell("{pol: gdal.Open(imagefile[pol]) for pol in polarizations}", test_vrt_dict)
+test.add_test("{pol: gdal.Open(imagefile[pol]) for pol in polarizations}", test_vrt_dict)
 
 # Confirm raster shape = (921, 1069)
 test_raster_shape = """
@@ -79,7 +79,7 @@ if raster.shape == (921, 1069):
 else:
     test.log_test('f', f"raster.shape == {raster.shape}. Expected (921, 1069)")
 """
-test.add_test_cell("raster = band.ReadAsArray()", test_raster_shape)
+test.add_test("raster = band.ReadAsArray()", test_raster_shape)
 
 # Confirm that time series animation was created
 test_animation = """
@@ -88,7 +88,7 @@ if os.path.exists(f\"{product_path}/animation.gif\"):
 else:
     test.log_test('f', f"{product_path}/animation.gif does NOT exist")
 """
-test.add_test_cell("ani.save(f\"{product_path}/animation.gif\", writer='pillow', fps=2)", test_animation)
+test.add_test("ani.save(f\"{product_path}/animation.gif\", writer='pillow', fps=2)", test_animation)
 
 # Confirm that the time-series of means histogram was created
 test_rcs = """
@@ -97,7 +97,7 @@ if os.path.exists(f"{product_path}/RCSoverTime.png"):
 else:
     test.log_test('f', f"{product_path}/RCSoverTime.png does NOT exist")
 """
-test.add_test_cell("plt.savefig(f\"{product_path}/RCSoverTime.png\",", test_rcs)
+test.add_test("plt.savefig(f\"{product_path}/RCSoverTime.png\",", test_rcs)
 
 # Confirm anmimation histogram was created
 test_ani_hist = """
@@ -106,7 +106,7 @@ if os.path.exists(f"{product_path}/animation_histogram.gif"):
 else:
     test.log_test('f', f"{product_path}/animation_histogram.gif does NOT exist")
 """
-test.add_test_cell("ani.save(f\"{product_path}/animation_histogram.gif\",", test_ani_hist)
+test.add_test("ani.save(f\"{product_path}/animation_histogram.gif\",", test_ani_hist)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 

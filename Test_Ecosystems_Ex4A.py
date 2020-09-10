@@ -10,12 +10,12 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Ecosystems/Exercise4A-SARChangeDetectionMethods.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_Ex2-4_S1-MadreDeDios\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Ex2-4_S1-MadreDeDios"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -35,7 +35,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test("!aws s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Check that 156 tiffs were extracted from the tarball
 test_extract = """
@@ -47,7 +47,7 @@ if test_len == 156:
 else:
     test.log_test('f', f"Expected 156 tifs extracted from tarball, found {test_len}")
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_extract)
+test.add_test("asf_unzip(os.getcwd(), time_series)", test_extract)
 
 # Check that raster_stack.vrt was created
 test_vv_vrt = """    
@@ -56,7 +56,7 @@ if os.path.exists(\"raster_stack.vrt\"):
 else:
     test.log_test('f', f"raster_stack.vrt not found")    
 """
-test.add_test_cell("!gdalbuildvrt -separate raster_stack.vrt", test_vv_vrt)
+test.add_test("!gdalbuildvrt -separate raster_stack.vrt", test_vv_vrt)
 
 # Confirm size and type of datetime index 
 test_tindex_VH = """
@@ -69,7 +69,7 @@ if len(tindex_VH) == 78:
 else:
     test.log_test('f', f"len(tindex_VH) == {len(tindex_VH)},  NOT 78")
 """
-test.add_test_cell("tindex_VH = pd.DatetimeIndex(dates_VH)", test_tindex_VH)
+test.add_test("tindex_VH = pd.DatetimeIndex(dates_VH)", test_tindex_VH)
 
 # Confirm type and shape of rasterstack_VH
 test_rasterstack_VH = """
@@ -82,7 +82,7 @@ if rasterstack_VH.shape == (78, 1102, 1090):
 else:
     test.log_test('f', f"rasterstack_VH.shape) == {rasterstack_VH.shape},  NOT (78, 1102, 1090)")
 """
-test.add_test_cell("rasterstack_VH = img.ReadAsArray()", test_rasterstack_VH)
+test.add_test("rasterstack_VH = img.ReadAsArray()", test_rasterstack_VH)
 
 # Confirm creation of plots_and_animations directory
 test_product_path = """
@@ -91,7 +91,7 @@ if os.path.exists(f"{path}/{product_path}"):
 else:
     test.log_test('f', f"{path}/{product_path} NOT found")
 """
-test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+test.add_test("product_path = 'plots_and_animations'", test_product_path)
 
 # Confirm the creation of animation_VH.gif
 test_animation_VH_gif = """
@@ -100,7 +100,7 @@ if os.path.exists(f'{product_path}/animation_VH.gif'):
 else:
     test.log_test('f', f"{product_path}/animation_VH.gif NOT found")
 """
-test.add_test_cell("ani.save(f'{product_path}/animation_VH", test_animation_VH_gif)
+test.add_test("ani.save(f'{product_path}/animation_VH", test_animation_VH_gif)
 
 # Confirm rasterPwr type and shape
 test_rasterPwr = """
@@ -113,7 +113,7 @@ if rasterPwr.shape == (78, 1102, 1090):
 else:
     test.log_test('f', f"rasterPwr.shape == {rasterPwr.shape}, NOT (78, 1102, 1090)")    
 """
-test.add_test_cell("rasterPwr = np.ma.array(rasterstack_VH", test_rasterPwr)
+test.add_test("rasterPwr = np.ma.array(rasterstack_VH", test_rasterPwr)
 
 # Confirm metric_keys
 test_metric_keys = """
@@ -127,7 +127,7 @@ else:
                         ", 'median', 'p5', 'p95', 'prange', 'var', 'cov'])"))
     
 """
-test.add_test_cell("metric_keys = metrics.keys()", test_metric_keys)
+test.add_test("metric_keys = metrics.keys()", test_metric_keys)
 
 # Confirm creation of changes_percentilerange_threshold.png
 test_changes_percentilerange_threshold_png = """
@@ -136,7 +136,7 @@ if os.path.exists(f"{path}/{product_path}/changes_percentilerange_threshold.png"
 else:
     test.log_test('f', f"{path}/{product_path}/changes_percentilerange_threshold.png NOT found")
 """
-test.add_test_cell("plt.savefig(f'{product_path}/changes_percentilerange", 
+test.add_test("plt.savefig(f'{product_path}/changes_percentilerange", 
                    test_changes_percentilerange_threshold_png)
 
 # Confirm creation of changes_var_threshold.png
@@ -146,7 +146,7 @@ if os.path.exists(f"{path}/{product_path}/changes_var_threshold.png"):
 else:
     test.log_test('f', f"{path}/{product_path}/changes_var_threshold.png NOT found")
 """
-test.add_test_cell("plt.savefig(f'{product_path}/changes_var_threshold.png'", 
+test.add_test("plt.savefig(f'{product_path}/changes_var_threshold.png'", 
                    test_changes_var_threshold_png)
 
 # Confirm creation of changes_CV_threshold.png"
@@ -156,7 +156,7 @@ if os.path.exists(f"{path}/{product_path}/changes_CV_threshold.png"):
 else:
     test.log_test('f', f"{path}/{product_path}/changes_CV_threshold.png NOT found")
 """
-test.add_test_cell("plt.savefig(f\"{product_path}/changes_CV_threshold.png\"", 
+test.add_test("plt.savefig(f\"{product_path}/changes_CV_threshold.png\"", 
                    test_changes_CV_threshold_png)
 
 # Confirm shape of tsmean
@@ -166,7 +166,7 @@ if tsmean.shape == (78,):
 else:
     test.log_test('f', f"tsmean.shape == {tsmean.shape}, NOT (78,)")
 """
-test.add_test_cell("tsmean = 10*np.log10(np.", test_tsmean)
+test.add_test("tsmean = 10*np.log10(np.", test_tsmean)
 
 # Confirm ts type and shape
 test_ts = """
@@ -179,7 +179,7 @@ if ts.shape == (78,):
 else:
     test.log_test('f', f"ts.shape == {ts.shape}, NOT (78,)")
 """
-test.add_test_cell("ts = pd.Series(tsmean, index=tindex_VH)", test_ts)
+test.add_test("ts = pd.Series(tsmean, index=tindex_VH)", test_ts)
 
 # Confirm type and shape of r
 test_r = """
@@ -192,7 +192,7 @@ if r.shape == (1102, 1090):
 else:
     test.log_test('f', f"r.shape == {r.shape}, NOT (1102, 1090)")
 """
-test.add_test_cell("r = np.log10(cross_pol_new / cross_pol_ref)", test_r)
+test.add_test("r = np.log10(cross_pol_new / cross_pol_ref)", test_r)
 
 # Confirm creation of thresh_percentilerange_histogram.png"
 test_thresh_percentilerange_histogram_png = """
@@ -201,7 +201,7 @@ if os.path.exists(f"{path}/{product_path}/thresh_percentilerange_histogram.png")
 else:
     test.log_test('f', f"{path}/{product_path}/thresh_percentilerange_histogram.png NOT found")
 """
-test.add_test_cell("plt.savefig(os.path.join(product_path, 'thresh_", 
+test.add_test("plt.savefig(os.path.join(product_path, 'thresh_", 
                    test_thresh_percentilerange_histogram_png)
 
 # Confirm creation of changes_CV_threshold.png"
@@ -211,7 +211,7 @@ if os.path.exists(f"{path}/{product_path}/changes_CV_threshold.png"):
 else:
     test.log_test('f', f"{path}/{product_path}/changes_CV_threshold.png NOT found")
 """
-test.add_test_cell("plt.savefig(f\"{product_path}/changes_CV_threshold.png\"", 
+test.add_test("plt.savefig(f\"{product_path}/changes_CV_threshold.png\"", 
                    test_changes_CV_threshold_png)
 
 # Check geotrans and proj
@@ -228,7 +228,7 @@ if type(proj) == str and len(proj) > 8:
 else:
     test.log_test('f', f"Invalid projection information: {proj}")
 """
-test.add_test_cell("geotrans = list(img.GetGeoTransform())", test_geotrans_and_proj)
+test.add_test("geotrans = list(img.GetGeoTransform())", test_geotrans_and_proj)
 
 # Confirm creation of raster_stack_tsmetrics directory
 test_raster_stack_tsmetrics = """
@@ -237,7 +237,7 @@ if os.path.exists(f"{path}/raster_stack_tsmetrics"):
 else:
     test.log_test('f', f"{path}/raster_stack_tsmetrics NOT found")
 """
-test.add_test_cell("dirname = image_file_VH.repl", test_raster_stack_tsmetrics)
+test.add_test("dirname = image_file_VH.repl", test_raster_stack_tsmetrics)
 
 # Confirm creation of metrics GeoTiffs
 test_metrics_geotiffs = """
@@ -247,7 +247,7 @@ for name in names:
     else:
         test.log_test('f', f"{path}/{name} NOT found")
 """
-test.add_test_cell("create_geotiff(name, metrics[i],", test_metrics_geotiffs)
+test.add_test("create_geotiff(name, metrics[i],", test_metrics_geotiffs)
 
 # Confirm creation of metrics vrt
 test_metric_vrt = """
@@ -261,7 +261,7 @@ if len(test_metrics_vrt_info['files']) == 11:
 else:
     test.log_test('f', f"{dirname}.vrt contains {len(test_metrics_vrt_info['files'])} files, NOT 11")
 """
-test.add_test_cell("cmd = 'gdalbuildvrt -separate -overwrite -vrtnodata nan", test_metric_vrt)
+test.add_test("cmd = 'gdalbuildvrt -separate -overwrite -vrtnodata nan", test_metric_vrt)
 
     
 # Confirm creation of GeoTiffs from 4 change detection attempts
@@ -278,7 +278,7 @@ for tiff in test_geotiffs:
     else:
         test.log_test('f', f"{tiff} EPSG == {repr(test_tiff_info['coordinateSystem']['wkt'][-7:-2])}, NOT '32719'")
 """
-test.add_test_cell("create_geotiff(imagenamepdiff,", test_final_geotiffs)
+test.add_test("create_geotiff(imagenamepdiff,", test_final_geotiffs)
        
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 

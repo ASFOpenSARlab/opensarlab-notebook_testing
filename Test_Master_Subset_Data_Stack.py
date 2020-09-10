@@ -10,12 +10,12 @@ from asf_notebook import asf_unzip
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Master/Subset_Data_Stack.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 test_replace_analysis_dir = """
-analysis_dir = "/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack"
+analysis_dir = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack"
 try:
     shutil.rmtree(analysis_dir)
 except FileNotFoundError:
@@ -68,30 +68,30 @@ if utm == '32646':
 else:
     test.log_test('f', f"utm == {utm}, NOT '32646'")
 '''
-test.add_test_cell("utm = info.split('ID')[-1].split(',')[1][0:-2]", test_utm)
+test.add_test("utm = info.split('ID')[-1].split(',')[1][0:-2]", test_utm)
 
 
 # Confirm tiff_paths contains expected paths
 test_tiff_paths = '''
-test_tiff_pths = ['/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170611T120430_DVP_RTC30_G_gpuned_110E_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170623T120431_DVP_RTC30_G_gpuned_F322_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170705T120431_DVP_RTC30_G_gpuned_E078_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170717T120432_DVP_RTC30_G_gpuned_4B27_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170729T120433_DVP_RTC30_G_gpuned_6F19_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170810T120434_DVP_RTC30_G_gpuned_D26B_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170822T120434_DVP_RTC30_G_gpuned_6C6E_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170903T120435_DVP_RTC30_G_gpuned_08BD_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170915T120435_DVP_RTC30_G_gpuned_C402_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170927T120435_DVP_RTC30_G_gpuned_ACF8_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171009T120436_DVP_RTC30_G_gpuned_616C_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171021T120436_DVP_RTC30_G_gpuned_C4E5_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171102T120436_DVP_RTC30_G_gpuned_1F2B_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171114T120435_DVP_RTC30_G_gpuned_093B_VH.tif']
+test_tiff_pths = ['/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170611T120430_DVP_RTC30_G_gpuned_110E_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170623T120431_DVP_RTC30_G_gpuned_F322_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170705T120431_DVP_RTC30_G_gpuned_E078_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170717T120432_DVP_RTC30_G_gpuned_4B27_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170729T120433_DVP_RTC30_G_gpuned_6F19_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170810T120434_DVP_RTC30_G_gpuned_D26B_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170822T120434_DVP_RTC30_G_gpuned_6C6E_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170903T120435_DVP_RTC30_G_gpuned_08BD_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170915T120435_DVP_RTC30_G_gpuned_C402_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170927T120435_DVP_RTC30_G_gpuned_ACF8_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171009T120436_DVP_RTC30_G_gpuned_616C_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171021T120436_DVP_RTC30_G_gpuned_C4E5_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171102T120436_DVP_RTC30_G_gpuned_1F2B_VH.tif', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171114T120435_DVP_RTC30_G_gpuned_093B_VH.tif']
 if tiff_paths == test_tiff_pths:
     test.log_test('p', f"tiff_paths == {test_tiff_pths}")
 else:
     test.log_test('f', f"tiff_paths == {tiff_paths}, NOT {test_tiff_pths}")
 '''
-test.add_test_cell('to_merge = {}', test_tiff_paths)
+test.add_test('to_merge = {}', test_tiff_paths)
 
 
 # Confirm merge_paths contains expected path/s
 # Note: merge_paths starts with a space
 test_merge_paths = '''
-test_merge_pths = " /home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif"
+test_merge_pths = " /home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif"
 if merge_paths == test_merge_pths:
     test.log_test('p', f"merge_paths == {test_merge_pths}")
 else:
     test.log_test('f', f"merge_paths == {merge_paths}, NOT {test_merge_pths}")
 '''
-test.add_test_cell("if str_coords not in to_merge:", test_merge_paths)
+test.add_test("if str_coords not in to_merge:", test_merge_paths)
 
 
 # Confirm full_scene tiff file type and band, line, and pixel size
@@ -115,7 +115,7 @@ if test_full_scene_file.RasterYSize == 7060:
 else:
     test.log_test('f', f"full_scene has {test_full_scene_file.RasterYSize} lines, NOT 7060")
 '''
-test.add_test_cell('gdal_command = f"gdal_merge.py -o {full_scene} {merge_paths}"', test_full_scene)
+test.add_test('gdal_command = f"gdal_merge.py -o {full_scene} {merge_paths}"', test_full_scene)
 
 
 # Confirm raster_stack.vrt file type, band, line, and pixel size, and rasterstack.shape
@@ -142,7 +142,7 @@ if rasterstack.shape == (7060, 9570):
 else:
     test.log_test('f', f"rasterstack.shape == {rasterstack.shape}, NOT (7060, 9570)")
 '''
-test.add_test_cell('img = gdal.Open(image_file)', test_full_scene)
+test.add_test('img = gdal.Open(image_file)', test_full_scene)
 
 
 # Confirm geotrans == (74760.0, 30.0, 0.0, 2841660.0, 0.0, -30.0)
@@ -152,7 +152,7 @@ if geotrans == (74760.0, 30.0, 0.0, 2841660.0, 0.0, -30.0):
 else:
     test.log_test('f', f"geotrans == {geotrans}, NOT (74760.0, 30.0, 0.0, 2841660.0, 0.0, -30.0)")
 '''
-test.add_test_cell("geotrans = img.GetGeoTransform()", test_geotrans)
+test.add_test("geotrans = img.GetGeoTransform()", test_geotrans)
 
 
 # Confirm aoi_coords == [[166447.20967741933, 2731329.580645161], [213865.01612903227, 2698235.9032258065]]
@@ -162,7 +162,7 @@ if aoi_coords == [[166447.20967741933, 2731329.580645161], [213865.01612903227, 
 else:
     test.log_test('f', f"aoi_coords == {aoi_coords}, NOT [[166447.20967741933, 2731329.580645161], [213865.01612903227, 2698235.9032258065]]")
 '''
-test.add_test_cell("aoi_coords = [geolocation(aoi.x1, aoi.y1", test_aoi_coords)
+test.add_test("aoi_coords = [geolocation(aoi.x1, aoi.y1", test_aoi_coords)
 
 
 # Confirm creation of subset_dir
@@ -172,18 +172,18 @@ if os.path.exists(subset_dir):
 else:
     test.log_test('f', f"{subset_dir} NOT found")
 '''
-test.add_test_cell('new_directory(subset_dir)', test_subset_dir)
+test.add_test('new_directory(subset_dir)', test_subset_dir)
 
 
 # Confirm updated tiff_paths contain subset tiffs
 test_subset_tiff_paths = '''
-test_subset_tiff_pths = ['/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170530_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170611_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170623_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170705_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170717_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170729_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170810_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170822_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170903_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170915_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170927_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171009_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171021_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171102_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171114_VH.tiff']
+test_subset_tiff_pths = ['/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170530_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170611_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170623_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170705_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170717_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170729_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170810_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170822_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170903_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170915_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20170927_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20171009_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20171021_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20171102_VH.tiff', '/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Test_Subset_Data_Stack/subset/20171114_VH.tiff']
 if tiff_paths == test_subset_tiff_pths:
     test.log_test('p', f"tiff_paths == {test_subset_tiff_pths}")
 else:
     test.log_test('f', f"tiff_paths == {tiff_paths}, NOT {test_subset_tiff_pths}")
 '''
-test.add_test_cell("tiff_paths = get_tiff_paths(subset_paths)", test_subset_tiff_paths)
+test.add_test("tiff_paths = get_tiff_paths(subset_paths)", test_subset_tiff_paths)
 
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########

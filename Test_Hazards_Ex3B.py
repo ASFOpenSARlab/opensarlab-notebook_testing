@@ -11,13 +11,13 @@ from asf_jupyter_test import std_out_io
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Hazards/"
        "Exercise3B-ExploreSARTimeSeriesDeforestation.ipynb")
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = ("path = \"/home/jovyan/notebooks/SAR_Training/English/"
                "Ecosystems/data_Ex2-4_S1-MadreDeDios\"")
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_Ex2-4_S1-MadreDeDios"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
 
@@ -41,7 +41,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test("!aws s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the zip
 test_zip_extraction = """
@@ -52,7 +52,7 @@ if test_tiff_qty == 156:
 else:
     test.log_test('f', f"{test_tiff_qty} tiffs extracted, NOT 156")
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_zip_extraction)
+test.add_test("asf_unzip(os.getcwd(), time_series)", test_zip_extraction)
 
 # Confirm the creation of VV and VH vrts and that they contain 79 files each
 test_vrts = """
@@ -78,7 +78,7 @@ if len(test_vh_vrt_info['files']) == 79:
 else:
     test.log_test('f', f"image_file_VH contains {len(test_vh_vrt_info['files'])} files, NOT 79")
 """
-test.add_test_cell("image_file_VV = \"raster_stack.vrt\"", test_vrts)
+test.add_test("image_file_VV = \"raster_stack.vrt\"", test_vrts)
 
 # Check creation and size of VV and VH pandas.DatetimeIndex
 test_vv_vh_datetimeindexes = """
@@ -101,7 +101,7 @@ if len(tindex_VH) == 78:
 else:
     test.log_test('f', f"len(tindex_VH) == {len(tindex_VH)}, NOT 78")
 """
-test.add_test_cell("tindex_VV = pd.DatetimeIndex(dates_VV)", test_vv_vh_datetimeindexes)
+test.add_test("tindex_VV = pd.DatetimeIndex(dates_VV)", test_vv_vh_datetimeindexes)
 
 # Confirm rasterstack_VV.shape == (78, 1102, 1090)
 test_rasterstack_VV = """
@@ -110,7 +110,7 @@ if rasterstack_VV.shape == (78, 1102, 1090):
 else:
     test.log_test('f', f"rasterstack_VV.shape ==  {rasterstack_VV.shape}, NOT (78, 1102, 1090)")
 """
-test.add_test_cell("rasterstack_VV = img.ReadAsArray()", test_rasterstack_VV)
+test.add_test("rasterstack_VV = img.ReadAsArray()", test_rasterstack_VV)
 
 # Confirm db_mean.shape == (1102, 1090)
 test_db_mean = """
@@ -119,7 +119,7 @@ if db_mean.shape == (1102, 1090):
 else:
     test.log_test('f', f"db_mean.shape == {db_mean.shape}, NOT (1102, 1090)")
 """
-test.add_test_cell("db_mean = np.min(rasterstack_VV, axis=0)", test_db_mean)
+test.add_test("db_mean = np.min(rasterstack_VV, axis=0)", test_db_mean)
 
 # Check xsize, ysize, geotrans, bands, and projection for image_file_VV and image_file_VH
 test_size_geotrans_bands_proj = """
@@ -151,7 +151,7 @@ if proj[1][-8:-3] == '32719':
 else:
     test.log_test('f', f"image_file_VH projection == {repr(proj[1][-8:-3])}, NOT '32719'")
 """
-test.add_test_cell("proj.append(img_handle[-1].GetP", test_size_geotrans_bands_proj)
+test.add_test("proj.append(img_handle[-1].GetP", test_size_geotrans_bands_proj)
 
 # Check ref_x and ref_y values
 test_ref_x_ref_y = """
@@ -164,7 +164,7 @@ if ref_y == 8561760.0:
 else:
     test.log_test('f', f"ref_y == {ref_y}, NOT 8561760.0")
 """
-test.add_test_cell("ref_y=geotrans[0][3]", test_ref_x_ref_y)
+test.add_test("ref_y=geotrans[0][3]", test_ref_x_ref_y)
 
 # Confirm s_ts is a list of pandas.core.series.Series objects of dtype float64 and length 78
 test_s_ts = """
@@ -182,7 +182,7 @@ for i, _test_ts in enumerate(s_ts):
     else:
         test.log_test('f', f"s_ts[i].dtype == {repr(_test_ts.dtype)}, NOT 'float64'")
 """
-test.add_test_cell("s_ts.append(pd.Series(means", test_s_ts)
+test.add_test("s_ts.append(pd.Series(means", test_s_ts)
 
 # Confirm creation of time series backscatter histogram png
 test_histogram = """
@@ -191,7 +191,7 @@ if os.path.exists(f"{path}/{figname}"):
 else:
     test.log_test('f', f"{path}/{figname} NOT found")
 """
-test.add_test_cell("plt.savefig(figname,", test_histogram)
+test.add_test("plt.savefig(figname,", test_histogram)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 

@@ -11,12 +11,12 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = r"/home/jovyan/notebooks/ASF/GEOS_657_Labs/GEOS 657-Lab4-SARTimeSeriesAnalysis.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/asf_jupyter_notebook_testing"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/ASF/GEOS_657_Labs/lab_4_data\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_lab_4"
+test_data_path = "/home/jovyan/notebooks/asf_jupyter_notebook_testing/data_lab_4"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -36,7 +36,7 @@ if os.path.exists(f"{os.getcwd()}/time_series.zip"):
 else:
     test.log_test('f', f"time_series.zip NOT copied from s3://asf-jupyter-data/time_series.zip")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test("!aws s3 cp $time_series_path $time_series", test_s3_copy)
 
 
 # Confirm that all expected files were extracted from the zip
@@ -58,7 +58,7 @@ if test_dates_qty == 17:
 else:
     test.log_test('f', f"{test_dates_qty} dates files extracted, NOT 17")    
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_zip_extraction)
+test.add_test("asf_unzip(os.getcwd(), time_series)", test_zip_extraction)
 
 
 # Confirm creation of tindex
@@ -72,7 +72,7 @@ if tindex.size == 70:
 else:
     test.log_test('f', f"tindex.size == {tindex.size}, NOT 70")
 """
-test.add_test_cell("tindex = pd.DatetimeIndex(dates)", test_tindex)
+test.add_test("tindex = pd.DatetimeIndex(dates)", test_tindex)
 
 # Confirm raster_stack == (1270, 1547)
 test_raster = """
@@ -81,7 +81,7 @@ if raster.shape == (1270, 1547):
 else:
     test.log_test('f', f"raster.shape == {raster.shape}, NOT (1270, 1547)")
 """
-test.add_test_cell("raster = band.ReadAsArray()", test_raster)
+test.add_test("raster = band.ReadAsArray()", test_raster)
 
 # Confirm creation of plots_and_products directory
 test_product_path = """
@@ -90,7 +90,7 @@ if os.path.exists(f"{test_data_path}/{product_path}"):
 else:
     test.log_test('f', f"{test_data_path}/{product_path} directory NOT found")
 """
-test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+test.add_test("product_path = 'plots_and_animations'", test_product_path)
 
 # Confirm creation of animation.gif
 test_animation_gif = """
@@ -99,7 +99,7 @@ if os.path.exists(f"{test_data_path}/{product_path}/animation.gif"):
 else:
     test.log_test('f', f"{test_data_path}/{product_path}/animation.gif NOT found")
 """
-test.add_test_cell("ani.save('animation.gif', writer='pillow', fps=2)", test_animation_gif)
+test.add_test("ani.save('animation.gif', writer='pillow', fps=2)", test_animation_gif)
 
 # Confirm rs_means_pwr.shape == (70,)
 test_rs_means_pwr = """
@@ -108,7 +108,7 @@ if rs_means_pwr.shape == (70,):
 else:
     test.log_test('f', f"rs_means_pwr.shape == {rs_means_pwr.shape}, NOT (70,)")
 """
-test.add_test_cell("rs_means_pwr.shape", test_rs_means_pwr)
+test.add_test("rs_means_pwr.shape", test_rs_means_pwr)
 
 # Confirm creation of time_series_means.png
 test_time_series_means_png = """
@@ -117,7 +117,7 @@ if os.path.exists(f"{test_data_path}/{product_path}/time_series_means.png"):
 else:
     test.log_test('f', f"{test_data_path}/{product_path}/time_series_means.png NOT found")
 """
-test.add_test_cell("plt.savefig('time_series_means', dpi=72, transparent='true')",
+test.add_test("plt.savefig('time_series_means', dpi=72, transparent='true')",
                    test_time_series_means_png)
 
 # Confirm creation of animation_histogram.gif
@@ -127,7 +127,7 @@ if os.path.exists(f"{test_data_path}/{product_path}/animation_histogram.gif"):
 else:
     test.log_test('f', f"{test_data_path}/{product_path}/animation_histogram.gif NOT found")
 """
-test.add_test_cell("ani.save('animation_histogram.gif', writer='pillow', fps=2)", test_animation__histogram_gif)
+test.add_test("ani.save('animation_histogram.gif', writer='pillow', fps=2)", test_animation__histogram_gif)
 
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########

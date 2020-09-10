@@ -328,7 +328,7 @@ class ASFNotebookTest:
             raise SearchFailedException
         self.replace_cells.update({index: [replacement_code]})
 
-    def add_test_cell(self, search_str: str, test_code: str):
+    def add_test(self, search_str: str, test_code: str):
         """
         search_str: a search string to locate cell
         test_code: custom test code to append to target cell
