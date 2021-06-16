@@ -11,7 +11,7 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = r"/home/jovyan/notebooks/SAR_Training/English/Master/InSAR_volcano_source_modeling.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
@@ -26,6 +26,13 @@ try:
 except:
    pass
 
+# Skip all cells inputing user defined values for filtering products to download
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/insar_analysis':"]
+           
+for search_str in skip_em:
+    test.replace_cell(search_str)
+
 
 ######### TESTS ###########
 
@@ -36,7 +43,7 @@ if os.path.exists(deformation_map):
 else:
     test.log_test('f', f"{deformation_map} NOT successfully copied from {deformation_map_path}")
 """
-test.add_test_cell("subprocess.check_call(['aws', 's3', 'cp',  deformation_map_path, deformation_map])",
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $deformation_map_path $deformation_map",
                    test_s3_copy)
 
 # Confirm observed_deformation_map.shape == (980, 1100)
