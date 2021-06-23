@@ -11,7 +11,7 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise4B-SARTimeSeriesChangeDetection.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
@@ -26,6 +26,13 @@ try:
 except:
    pass
 
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
 
 ######### TESTS ###########
 
@@ -36,7 +43,7 @@ if os.path.exists(f"{os.getcwd()}/Niamey.zip"):
 else:
     test.log_test('f', f"Niamey.zip NOT copied from s3://asf-jupyter-data/Niamey.zip")
 """
-test.add_test_cell("!aws s3 cp s3://asf-jupyter-data/Niamey.zip Niamey.zip", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip Niamey.zip", test_s3_copy)
 
 # Confirm that all expected files were extracted from the zip
 test_zip_extraction = """
