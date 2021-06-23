@@ -10,12 +10,12 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = r"/home/jovyan/notebooks/ASF/GEOS_657_Labs/GEOS 657-Lab6-VolcanoSourceModelingfromInSAR.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+notebook_pth = r"/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/GEOS 657-Lab6-VolcanoSourceModelingfromInSAR.ipynb"
+log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = \"/home/jovyan/notebooks/ASF/GEOS_657_Labs/lab_6_data\""
+_to_replace = "path = \"/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/lab_6_data\""
 test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_lab_6"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
@@ -30,7 +30,14 @@ try:
 except:
    pass
 
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/insar_analysis':"]
 
+for search_str in skip_em:
+    test.replace_cell(search_str)
+    
 ######### TESTS ###########
 
 # Check that the data was downloaded from the S3 bucket
@@ -40,8 +47,9 @@ if os.path.exists(deformation_map):
 else:
     test.log_test('f', f"{deformation_map} NOT successfully copied from {deformation_map_path}")
 """
-test.add_test_cell("subprocess.check_call(['aws', 's3', 'cp',  deformation_map_path, deformation_map])",
-                   test_s3_copy)
+#test.add_test_cell("subprocess.check_call(['aws', 's3', 'cp',  deformation_map_path, deformation_map])",
+#                   test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $deformation_map_path $deformation_map", test_s3_copy)
 
 # Confirm observed_deformation_map.shape == (980, 1100)
 test_observed_deformation_map = """
