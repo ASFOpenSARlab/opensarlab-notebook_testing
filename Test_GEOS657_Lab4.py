@@ -20,6 +20,12 @@ test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_lab_4"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
+# Change data directory for product files
+_to_replace = "datadirectory = \'/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/lab_4_data/time_series/S32644X696260Y3052060sS1-EBD\'"
+test_data_directory = "/home/jovyan/notebooks/notebook_testing_dev/data_lab_4/time_series/S32644X696260Y3052060sS1-EBD"
+_replacement = f"datadirectory = f\"{test_data_directory}\""
+test.replace_line(_to_replace, _to_replace, _replacement)
+
 # Erase data directory if already present
 try:
    shutil.rmtree(test_data_path)
@@ -69,12 +75,6 @@ else:
     test.log_test('f', f"{test_dates_qty} dates files extracted, NOT 17")    
 """
 test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_zip_extraction)
-
-# Change data directory for product files
-_to_replace = "datadirectory = \'/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/lab_4_data/time_series/S32644X696260Y3052060sS1-EBD\'"
-test_data_directory = "/home/jovyan/notebooks/notebook_testing_dev/data_lab_4/time_series/S32644X696260Y3052060sS1-EBD"
-_replacement = f"datadirectory = f\"{test_data_directory}\""
-test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Confirm creation of tindex
 test_tindex = """
