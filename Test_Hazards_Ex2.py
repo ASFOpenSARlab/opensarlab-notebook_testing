@@ -11,7 +11,7 @@ from asf_jupyter_test import std_out_io
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Hazards/"
        "Exercise2-RGBandMetricsVisualization.ipynb")
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
@@ -26,6 +26,13 @@ try:
 except:
    pass
 
+# Skip all cells inputing user defined values for filtering products to download
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
+
 ######### TESTS ###########
 
 # Check that the data was downloaded from the S3 bucket
@@ -35,7 +42,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path", test_s3_copy)
 
 # Check that 156 tiffs were extracted from the tarball
 test_extract = """
