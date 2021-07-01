@@ -16,7 +16,7 @@ test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = ("path = \"/home/jovyan/notebooks/SAR_Training/English/"
-               "Ecosystems/data_Ex2-4_S1-MadreDeDios\"")
+               "Hazards/data_Ex2-4_S1-MadreDeDios\"")
 test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
