@@ -1,44 +1,46 @@
-#! /bin/bash
+#! /bin/sh
 oldlogs="/home/jovyan/notebooks/notebook_testing_logs/old_logs/*.log"
 for f in $oldlogs
 do
    rm $f
 done
 echo 'Activating rtc_analysis env'
+conda init bash
+source ~/.bashrc
 conda activate /home/jovyan/.local/envs/rtc_analysis
 echo 'Running Test_Ecosystems_Ex1.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex1.py
-#echo 'Running Test_Ecosystems_Ex2.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
-#echo 'Running Test_Ecosystems_Ex3.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
-#echo 'Running Test_Ecosystems_Ex4A.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
-#echo 'Running Test_Ecosystems_Ex4B.py'
-#python Test_Ecosystems_Ex4B.py
-#echo 'Running Test_GEOS657_Lab4.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
-#echo 'Running Test_Hazards_Ex1.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
-#echo 'Running Test_Hazards_Ex2.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
-#echo 'Running Test_Hazards_Ex3B.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
-#echo 'Running Test_Hazards_Ex4A.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
-#echo 'Running Test_Hazards_Ex4B.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
-#echo 'Running Test_Master_Change_Detection_Amplitude_Time_Series_Example.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
+echo 'Running Test_Ecosystems_Ex2.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
+echo 'Running Test_Ecosystems_Ex3.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
+echo 'Running Test_Ecosystems_Ex4A.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
+echo 'Running Test_Ecosystems_Ex4B.py'
+python Test_Ecosystems_Ex4B.py
+echo 'Running Test_GEOS657_Lab4.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
+echo 'Running Test_Hazards_Ex1.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
+echo 'Running Test_Hazards_Ex2.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
+echo 'Running Test_Hazards_Ex3B.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
+echo 'Running Test_Hazards_Ex4A.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
+echo 'Running Test_Hazards_Ex4B.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
+echo 'Running Test_Master_Change_Detection_Amplitude_Time_Series_Example.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
 echo 'Deactivating rtc_analysis env'
 conda deactivate
-#echo 'Activating insar_analysis env'
-#conda activate /home/jovyan/.local/envs/insar_analysis
-#echo 'Running Test_Master_InSAR_volcano_source_modeling.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
-#echo 'Running Test_GEOS657_Lab6.py'
-#python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
-#conda deactivate
+echo 'Activating insar_analysis env'
+conda activate /home/jovyan/.local/envs/insar_analysis
+echo 'Running Test_Master_InSAR_volcano_source_modeling.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
+echo 'Running Test_GEOS657_Lab6.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
+conda deactivate
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'
 # Get rid of spaces in log filenames
