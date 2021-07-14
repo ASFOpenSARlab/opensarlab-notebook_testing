@@ -4,42 +4,31 @@ for f in $oldlogs
 do
    rm $f
 done
-echo 'Activating rtc_analysis env'
+# Activate rtc_analysis conda environment
 conda init bash
 source ~/.bashrc
 conda activate /home/jovyan/.local/envs/rtc_analysis
-echo 'Running Test_Ecosystems_Ex1.py'
+# Run tests on notebooks that use rtc_analysis environment
 python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex1.py
-echo 'Running Test_Ecosystems_Ex2.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
-echo 'Running Test_Ecosystems_Ex3.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
-echo 'Running Test_Ecosystems_Ex4A.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
-echo 'Running Test_Ecosystems_Ex4B.py'
-python Test_Ecosystems_Ex4B.py
-echo 'Running Test_GEOS657_Lab4.py'
+python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
-echo 'Running Test_Hazards_Ex1.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
-echo 'Running Test_Hazards_Ex2.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
-echo 'Running Test_Hazards_Ex3B.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
-echo 'Running Test_Hazards_Ex4A.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
-echo 'Running Test_Hazards_Ex4B.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
-echo 'Running Test_Master_Change_Detection_Amplitude_Time_Series_Example.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
-echo 'Deactivating rtc_analysis env'
+# Deactive rtc_analysis environment
 conda deactivate
-echo 'Activating insar_analysis env'
+# Activate insar_analysis conda environment
 conda activate /home/jovyan/.local/envs/insar_analysis
-echo 'Running Test_Master_InSAR_volcano_source_modeling.py'
+# Run tests on notebooks that use insar_analysis environment
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
-echo 'Running Test_GEOS657_Lab6.py'
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
+# Deactive insar_analysis environment
 conda deactivate
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'
