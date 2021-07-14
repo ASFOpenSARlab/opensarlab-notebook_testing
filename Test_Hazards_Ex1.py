@@ -10,12 +10,12 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise1-ReadAnalyzeSARStack.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = ("analysis_dir = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\"")
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/{name}"
 _replacement = f"analysis_dir = \"{test_data_path}\""
 test.replace_line("analysis_dir = f\"/home/jovyan/notebooks", _to_replace, _replacement)
 

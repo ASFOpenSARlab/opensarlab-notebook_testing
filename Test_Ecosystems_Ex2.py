@@ -13,12 +13,12 @@ from asf_jupyter_test import std_out_io
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Ecosystems/"
        "Exercise2-RGBandMetricsVisualization.ipynb")
-log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/S1-MadreDeDios\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/S1-MadreDeDios"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/S1-MadreDeDios"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
 

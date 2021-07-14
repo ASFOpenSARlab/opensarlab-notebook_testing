@@ -1,5 +1,5 @@
 #! /bin/sh
-oldlogs="/home/jovyan/notebooks/notebook_testing_logs/old_logs/*.log"
+oldlogs="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/*.log"
 for f in $oldlogs
 do
    rm $f
@@ -33,7 +33,7 @@ conda deactivate
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'
 # Get rid of spaces in log filenames
-oldnames="/home/jovyan/notebooks/notebook_testing_logs/*.log"
+oldnames="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/*.log"
 for f in $oldnames
 do
   new="${f// /_}"
@@ -50,7 +50,7 @@ fi
 done
 now=$(date +'%m_%d_%Y')
 issue_counter=0
-FILES="/home/jovyan/notebooks/notebook_testing_logs/*.test.log"
+FILES="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/*.test.log"
 for f in $FILES
    do
    fail_flag="FALSE"
@@ -71,12 +71,12 @@ for f in $FILES
             echo "Tests PASSED!" >> test_report_$now.txt
          fi
       fi
-   mv $f  "/home/jovyan/notebooks/notebook_testing_logs/old_logs/"
+   mv $f  "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/"
    done
-infologs="/home/jovyan/notebooks/notebook_testing_logs/*.info.log"
+infologs="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/*.info.log"
 for f in $infologs
 do
-   mv $f "/home/jovyan/notebooks/notebook_testing_logs/old_logs/"
+   mv $f "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/"
 done
 mv test_report_$now.txt "/home/jovyan/opensarlab-notebook_testing/reports/"
 echo 'Issues: '$issue_counter

@@ -11,12 +11,12 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Master/Change_Detection_Amplitude_Time_Series_Example.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Master/data_Change_Detection_Amplitude_Time_Series_Example\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
