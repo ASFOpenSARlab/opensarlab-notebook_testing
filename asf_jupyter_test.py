@@ -2,6 +2,7 @@
 # ASF_Jupyter_Test.py
 # Alex Lewandowski
 # 6-25-2020
+# Tim Stern add end of notebook path to log file names 7-15-2021
 
 import ast
 import astor
