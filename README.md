@@ -1,6 +1,12 @@
 # asf_jupyter_notebook_testing
 OpenSARlabs notebook testing module and notebook test scripts
 
+The test suite requires the following directories to be set up:
+/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev
+/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs
+/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs
+/home/jovyan/opensarlab-notebook_testing/reports
+
 Setup for cron to run test_driver.sh (Note: This required sudo access in OSL):
 1) Start an instance of OpenSarlabs in Amazon Workspace (this is necessarry to keep the instance open through internet outages and other interruptions).
 2) Open a terminal in OSL
@@ -17,4 +23,6 @@ Setup for cron to run test_driver.sh (Note: This required sudo access in OSL):
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/conda/bin
 SHELL=/bin/bash
 05 10 * * * source /home/jovyan/opensarlab-notebook_testing/test_driver.sh > /dev/null 2>&1
+# Delete reports more than 14 days old
+01 0 * * * /usr/bin/find /home/jovyan/opensarlab-notebook_testing/reports -name "*.txt" -type f -mtime +14 -delete
 
