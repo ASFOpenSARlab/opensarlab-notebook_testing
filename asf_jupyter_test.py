@@ -172,8 +172,9 @@ class ASFNotebookTest:
         self.skip_cells = []
         self.test_cells = {}
         self.notebook_path = notebook_path
-        self.info_logger = setup_logger('info_logger', f"{log_path}/{os.path.basename(notebook_path).split('.')[0]}.info.log")
-        self.test_logger = setup_logger('test_logger', f"{log_path}/{os.path.basename(notebook_path).split('.')[0]}.test.log")
+        prepend_dir = notebook_path.split('/')[-2] ###T.S. 7/15/2021
+        self.info_logger = setup_logger('info_logger', f"{log_path}/{prepend_dir}_{os.path.basename(notebook_path).split('.')[0]}.info.log")
+        self.test_logger = setup_logger('test_logger', f"{log_path}/{prepend_dir}_{os.path.basename(notebook_path).split('.')[0]}.test.log")
         self.code_dict = {}
         self.failed_count = 0
         self.exception_count = 0
