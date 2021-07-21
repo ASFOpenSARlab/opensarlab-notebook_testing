@@ -26,6 +26,7 @@ except:
    pass
 
 # Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
 skip_em = ["var kernel = Jupyter.notebook.kernel;",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
