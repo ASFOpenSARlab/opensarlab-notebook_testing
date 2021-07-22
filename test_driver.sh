@@ -21,6 +21,7 @@ python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
+python /home/jovyan/opensarlab-notebook_testing/Test_ASF_Projects_Subset_Data_Stack.py
 # Deactive rtc_analysis environment
 conda deactivate
 # Activate insar_analysis conda environment
@@ -78,6 +79,6 @@ for f in $infologs
 do
    mv $f "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/"
 done
+#mail -s "OSL Notebook Test Report" testern@alaska.edu <  test_report_$now.txt
 mv test_report_$now.txt "/home/jovyan/opensarlab-notebook_testing/reports/"
 echo 'Issues: '$issue_counter
-#echo "hello world" | mail -s "a subject" testern@alaska.edu
