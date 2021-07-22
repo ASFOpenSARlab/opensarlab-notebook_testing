@@ -28,11 +28,12 @@ try:
 except FileNotFoundError:
     pass
 os.mkdir(analysis_dir)
+os.chdir(analysis_dir)
 """
 test.replace_cell("if env[0] != '/home/jovyan/.local/envs/rtc_analysis':", test_replace_analysis_dir)
 
 # Download test data stack
-test_download = "!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/notebook_testing_data/jamalpur_stack_testing.zip data_Test_Subset_Data_Stack/jamalpur_stack_testing.zip"
+test_download = "!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/notebook_testing_data/jamalpur_stack_testing.zip notebook_testing_dev/data_Test_Subset_Data_Stack/jamalpur_stack_testing.zip"
 test.replace_cell('print("Enter the absolute path to the directory holding your tiffs.")', test_download) 
 
 # Unzip the downloaded stack
