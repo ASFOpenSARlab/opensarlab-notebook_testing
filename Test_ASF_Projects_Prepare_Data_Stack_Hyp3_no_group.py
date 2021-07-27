@@ -30,7 +30,7 @@ test.replace_line('analysis_directory = f"{os.getcwd()}/{data_dir}"',
 # Don't input a group id for testing
 test.replace_line("group_id = input", "group_id = input", "    group_id = ''\n")
 
-# Skip all cells inputing user defined values for filtering products to download
+# Skip all cells inputing user defined values for filtering products to download as well as conda env cells
 skip_em = ["var kernel = Jupyter.notebook.kernel;",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':",
            "login = asfn.EarthdataLogin()",
