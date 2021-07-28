@@ -14,7 +14,7 @@ test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 replace_data_dir = """
-data_dir = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Test_Prepare_Data_Stack_Hyp3"
+data_dir = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_data_Test_Prepare_Data_Stack_Hyp3"
 try:
     shutil.rmtree(data_dir)
 except FileNotFoundError:
