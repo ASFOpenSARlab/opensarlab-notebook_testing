@@ -17,6 +17,7 @@ python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
+python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3A.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
