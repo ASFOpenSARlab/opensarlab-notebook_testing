@@ -99,7 +99,7 @@ if merge_paths == test_merge_pths:
 else:
     test.log_test('f', f"merge_paths == {merge_paths}, NOT {test_merge_pths}")
 '''
-test.add_test_cell("if str_coords not in to_merge:", test_merge_hazards
+test.add_test_cell("if str_coords not in to_merge:", test_merge_paths)
 
 
 # Confirm full_scene tiff file type and band, line, and pixel size
