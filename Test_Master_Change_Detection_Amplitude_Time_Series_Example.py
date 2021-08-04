@@ -10,7 +10,7 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Master/Change_Detection_Amplitude_Time_Series_Example.ipynb"
+notebook_pth = "/home/jovyan/opensarlab-notebooks/SAR_Training/English/Master/Change_Detection_Amplitude_Time_Series_Example.ipynb"
 log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
