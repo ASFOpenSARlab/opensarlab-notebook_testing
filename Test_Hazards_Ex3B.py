@@ -11,13 +11,13 @@ from asf_jupyter_test import std_out_io
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Hazards/"
        "Exercise3B-ExploreSARTimeSeriesDeforestation.ipynb")
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = ("path = \"/home/jovyan/notebooks/SAR_Training/English/"
-               "Ecosystems/data_Ex2-4_S1-MadreDeDios\"")
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios"
+               "Hazards/data_Ex2-4_S1-MadreDeDios\"")
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
 
@@ -26,6 +26,14 @@ try:
    shutil.rmtree(test_data_path)
 except:
    pass
+
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
 
 # Replace manually input coords from matplotlib plot with hardcoded test coords
 _to_replace = "sarloc = (ceil(my_plot.x), ceil(my_plot.y))"
@@ -41,7 +49,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the zip
 test_zip_extraction = """

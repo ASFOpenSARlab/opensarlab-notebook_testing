@@ -11,12 +11,12 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = r"/home/jovyan/notebooks/SAR_Training/English/Master/InSAR_volcano_source_modeling.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_logs"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Master/data_InSAR_volcano_source_modeling\""
-test_data_path = "/home/jovyan/notebooks/data_InSAR_volcano_source_modeling"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_InSAR_volcano_source_modeling"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -27,6 +27,7 @@ except:
    pass
 
 # Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
 skip_em = ["var kernel = Jupyter.notebook.kernel;",
            "if env[0] != '/home/jovyan/.local/envs/insar_analysis':"]
            

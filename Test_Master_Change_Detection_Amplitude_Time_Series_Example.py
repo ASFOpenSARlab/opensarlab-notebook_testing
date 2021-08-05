@@ -11,12 +11,12 @@ from asf_jupyter_test import std_out_io
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Master/Change_Detection_Amplitude_Time_Series_Example.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Master/data_Change_Detection_Amplitude_Time_Series_Example\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example"
 _replacement = f"path = f\"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -25,6 +25,13 @@ try:
    shutil.rmtree(test_data_path)
 except:
    pass
+
+# Skip all cells inputing user defined values for filtering products to download
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
 
 
 ######### TESTS ###########
@@ -36,7 +43,7 @@ if os.path.exists(f"{os.getcwd()}/Niamey.zip"):
 else:
     test.log_test('f', f"Niamey.zip NOT copied from s3://asf-jupyter-data/Niamey.zip")
 """
-test.add_test_cell("!aws s3 cp s3://asf-jupyter-data/Niamey.zip Niamey.zip", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip Niamey.zip", test_s3_copy)
 
 # Confirm that all expected files were extracted from the zip
 test_zip_extraction = """

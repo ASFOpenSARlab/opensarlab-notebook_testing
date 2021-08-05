@@ -9,13 +9,13 @@ from asf_jupyter_test import std_out_io
 
 ######### INITIAL SETUP #########
 
-notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Ecosystems/Exercise1-ExploreSARTimeSeries_Example.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+notebook_pth = r"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/Exercise1-ExploreSARTimeSeries_Example.ipynb"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_time_series_example\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/data_time_series_example"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_time_series_example"
 _replacement = f"path = \"{test_data_path}\""
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -24,6 +24,14 @@ try:
    shutil.rmtree(test_data_path)
 except:
    pass
+
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
 
 ######### TESTS ###########
 
@@ -34,7 +42,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series_path}"):
 else:
     test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
 """
-test.add_test_cell("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $s3_path $time_series_path", test_s3_copy)
 
 # Confirm we have extracted 828 files from the zip
 test_extract = """

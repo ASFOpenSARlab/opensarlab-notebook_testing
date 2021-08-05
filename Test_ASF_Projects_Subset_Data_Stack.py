@@ -4,28 +4,36 @@ from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
 
 from asf_notebook import asf_unzip
-
+import shutil
+import os
 
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/ASF/Projects/Subset_Data_Stack.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
-# Change data path for testing
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
+
+# Change data path for testing. Had to use a different cell related to conda env checks for this.
 test_replace_analysis_dir = """
-analysis_dir = "/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack"
+analysis_dir = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack"
 try:
     shutil.rmtree(analysis_dir)
 except FileNotFoundError:
     pass
 os.mkdir(analysis_dir)
 """
-test.replace_cell('%matplotlib notebook', test_replace_analysis_dir)
+test.replace_cell("if env[0] != '/home/jovyan/.local/envs/rtc_analysis':", test_replace_analysis_dir)
 
 # Download test data stack
-test_download = "!aws s3 cp s3://asf-jupyter-data/notebook_testing_data/jamalpur_stack_testing.zip data_Test_Subset_Data_Stack/jamalpur_stack_testing.zip"
+test_download = "!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/notebook_testing_data/jamalpur_stack_testing.zip /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/jamalpur_stack_testing.zip"
 test.replace_cell('print("Enter the absolute path to the directory holding your tiffs.")', test_download) 
 
 # Unzip the downloaded stack
@@ -55,7 +63,7 @@ test.replace_cell("aoi_coords = [geolocation(aoi.x1, aoi.y1", test_set_coords)
 test.replace_line('sub_name = input()', 'sub_name = input()', '    sub_name = "subset"')
 
 # Skip file clean up widget cells
-test.replace_cell("cleanup = select_parameter(")
+test.replace_cell("cleanup = asfn.select_parameter(")
 test.replace_cell("if cleanup.value ==")
 
 
@@ -73,7 +81,7 @@ test.add_test_cell("utm = info.split('ID')[-1].split(',')[1][0:-2]", test_utm)
 
 # Confirm tiff_paths contains expected paths
 test_tiff_paths = '''
-test_tiff_pths = ['/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170611T120430_DVP_RTC30_G_gpuned_110E_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170623T120431_DVP_RTC30_G_gpuned_F322_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170705T120431_DVP_RTC30_G_gpuned_E078_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170717T120432_DVP_RTC30_G_gpuned_4B27_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170729T120433_DVP_RTC30_G_gpuned_6F19_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170810T120434_DVP_RTC30_G_gpuned_D26B_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170822T120434_DVP_RTC30_G_gpuned_6C6E_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170903T120435_DVP_RTC30_G_gpuned_08BD_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170915T120435_DVP_RTC30_G_gpuned_C402_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170927T120435_DVP_RTC30_G_gpuned_ACF8_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171009T120436_DVP_RTC30_G_gpuned_616C_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171021T120436_DVP_RTC30_G_gpuned_C4E5_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171102T120436_DVP_RTC30_G_gpuned_1F2B_VH.tif', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171114T120435_DVP_RTC30_G_gpuned_093B_VH.tif']
+test_tiff_pths = ['/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170611T120430_DVP_RTC30_G_gpuned_110E_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170623T120431_DVP_RTC30_G_gpuned_F322_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170705T120431_DVP_RTC30_G_gpuned_E078_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170717T120432_DVP_RTC30_G_gpuned_4B27_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170729T120433_DVP_RTC30_G_gpuned_6F19_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170810T120434_DVP_RTC30_G_gpuned_D26B_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170822T120434_DVP_RTC30_G_gpuned_6C6E_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170903T120435_DVP_RTC30_G_gpuned_08BD_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170915T120435_DVP_RTC30_G_gpuned_C402_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170927T120435_DVP_RTC30_G_gpuned_ACF8_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171009T120436_DVP_RTC30_G_gpuned_616C_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171021T120436_DVP_RTC30_G_gpuned_C4E5_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171102T120436_DVP_RTC30_G_gpuned_1F2B_VH.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20171114T120435_DVP_RTC30_G_gpuned_093B_VH.tif']
 if tiff_paths == test_tiff_pths:
     test.log_test('p', f"tiff_paths == {test_tiff_pths}")
 else:
@@ -85,7 +93,7 @@ test.add_test_cell('to_merge = {}', test_tiff_paths)
 # Confirm merge_paths contains expected path/s
 # Note: merge_paths starts with a space
 test_merge_paths = '''
-test_merge_pths = " /home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif"
+test_merge_pths = " /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/tiffs/S1A_IW_20170530T120429_DVP_RTC30_G_gpuned_1BC3_VH.tif"
 if merge_paths == test_merge_pths:
     test.log_test('p', f"merge_paths == {test_merge_pths}")
 else:
@@ -177,7 +185,7 @@ test.add_test_cell('new_directory(subset_dir)', test_subset_dir)
 
 # Confirm updated tiff_paths contain subset tiffs
 test_subset_tiff_paths = '''
-test_subset_tiff_pths = ['/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170530_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170611_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170623_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170705_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170717_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170729_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170810_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170822_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170903_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170915_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20170927_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171009_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171021_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171102_VH.tiff', '/home/jovyan/notebooks/notebook_testing_dev/data_Test_Subset_Data_Stack/subset/20171114_VH.tiff']
+test_subset_tiff_pths = ['/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170530_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170611_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170623_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170705_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170717_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170729_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170810_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170822_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170903_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170915_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20170927_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20171009_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20171021_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20171102_VH.tiff', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/projects_data_Test_Subset_Data_Stack/subset/20171114_VH.tiff']
 if tiff_paths == test_subset_tiff_pths:
     test.log_test('p', f"tiff_paths == {test_subset_tiff_pths}")
 else:

@@ -2,6 +2,7 @@
 
 from getpass import getpass
 import shutil
+import numpy
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -11,13 +12,13 @@ from asf_jupyter_test import std_out_io
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = ("/home/jovyan/notebooks/SAR_Training/English/Hazards/"
        "Exercise3A-ExploreSARTimeSeriesFlood.ipynb")
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = "path = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\""
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
-_replacement = f"path = f\"{test_data_path}\""
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/{name}"
+_replacement = f"    path = f\"{test_data_path}\""
 test.replace_line("path = f\"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
 
 # Erase data directory if already present
@@ -25,6 +26,14 @@ try:
    shutil.rmtree(test_data_path)
 except:
    pass
+
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
 
 # Replace manually input coords from matplotlib plot with hardcoded test coords
 _to_replace = "sarloc = (ceil(my_plot.x), ceil(my_plot.y))"
@@ -40,13 +49,13 @@ if os.path.exists(f"{path}/{time_series}"):
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the tarball
 test_tarball_extraction = """
 test_tiff_qty = len(glob("tiffsflood/*.tif"))
 if test_tiff_qty == 17:
-    test.log_test('p', f"17 tiffs extracted, as expected")
+    test.log_test('p', f"17 tiffs extracted, as expected") 
 else:
     test.log_test('f', f"{test_tiff_qty} tiffs extracted, NOT 17")
 if os.path.exists(f"{os.getcwd()}/stackflood_VV.vrt"):
@@ -84,10 +93,10 @@ test.add_test_cell("rasterstack = img.ReadAsArray()", test_rasterstack)
 
 # Confirm temporal min type and shape
 test_temporal_min = """
-if type(temporal_min) == np.ndarray:
-    test.log_test('p', f"type(temporal_min) == np.ndarray")
+if type(temporal_min) == numpy.ma.core.MaskedArray:
+    test.log_test('p', f"type(temporal_min) == <class 'numpy.ma.core.MaskedArray'>")
 else:
-    test.log_test('f', f"type(temporal_min) == {type(temporal_min)}, NOT np.ndarray")
+    test.log_test('f', f"type(temporal_min) == {type(temporal_min)}, NOT <class 'numpy.ma.core.MaskedArray'>")
 if temporal_min.shape == (1033, 1483):
     test.log_test('p', f"temporal_min.shape == (1033, 1483)")
 else:

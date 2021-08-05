@@ -10,12 +10,12 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Hazards/Exercise1-ReadAnalyzeSARStack.ipynb"
-log_pth = "/home/jovyan/notebooks/notebook_testing_dev"
+log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = ("analysis_dir = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\"")
-test_data_path = "/home/jovyan/notebooks/notebook_testing_dev/{name}"
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/{name}"
 _replacement = f"analysis_dir = \"{test_data_path}\""
 test.replace_line("analysis_dir = f\"/home/jovyan/notebooks", _to_replace, _replacement)
 
@@ -24,6 +24,14 @@ try:
    shutil.rmtree(test_data_path)
 except:
    pass
+
+# Skip all cells inputing user defined values for filtering products to download
+# or those involving conda environment checks
+skip_em = ["var kernel = Jupyter.notebook.kernel;",
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+
+for search_str in skip_em:
+    test.replace_cell(search_str)
 
 ######### TESTS ###########
 
@@ -34,7 +42,7 @@ if os.path.exists(f"{os.getcwd()}/{time_series_path}"):
 else:
     test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
 """
-test.add_test_cell("!aws s3 cp $s3_path $time_series_path", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $s3_path $time_series_path", test_s3_copy)
 
 # Check that 152 tiffs, 2 csvs, and 2 vrts were extracted from the tarball
 test_extract = """
