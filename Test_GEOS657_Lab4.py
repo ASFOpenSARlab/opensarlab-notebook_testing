@@ -10,7 +10,7 @@ from asf_jupyter_test import std_out_io
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = r"/home/jovyan/opensarlab-notebooks/ASF/GEOS_657_Labs/2019/GEOS 657-Lab4-SARTimeSeriesAnalysis.ipynb"
+notebook_pth = r"/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/GEOS 657-Lab4-SARTimeSeriesAnalysis.ipynb"
 log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 

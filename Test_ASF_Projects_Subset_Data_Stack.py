@@ -10,7 +10,7 @@ import os
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = "/home/jovyan/opensarlab-notebooks/ASF/Projects/Subset_Data_Stack.ipynb"
+notebook_pth = "/home/jovyan/notebooks/ASF/Projects/Subset_Data_Stack.ipynb"
 log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 

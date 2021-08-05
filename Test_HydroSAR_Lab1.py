@@ -11,7 +11,7 @@ from asf_jupyter_test import std_out_io
 
 ######### INITIAL SETUP #########
 
-notebook_pth = r"/home/jovyan/opensarlab-notebooks/SAR_Training/English/HydroSAR/Lab1-ExploreSARTimeSeries.ipynb"
+notebook_pth = r"/home/jovyan/notebooks/SAR_Training/English/HydroSAR/Lab1-ExploreSARTimeSeries.ipynb"
 log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
@@ -30,26 +30,26 @@ except:
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
 skip_em = ["var kernel = Jupyter.notebook.kernel;",
-           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]#,
-           #"def get_dates_sub(path):"]#,This didn't work
-           #'tiff_paths = f"{path}/tiffsflood/*.tif*"']
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"] #This didn't work,
+#            "def get_dates_sub(path):",#This didn't work
+#            'tiff_paths = f"{path}/tiffsflood/*.tif*"']
 
 for search_str in skip_em:
     test.replace_cell(search_str)
     
-## Change cell that calls module into a cell that runs the necessary code. This didn't work
-#replace_function_cell = """
-#tiff_paths = f"{path}/tiffsflood/*.tif*"
-#pths = glob(tiff_paths)
-#pths.sort()
-#dates = []
-#for pth in pths:
-#    date = os.path.basename(pth).split('_')[0]
-#    date = f"{date[:4]}-{date[4:6]}-{date[6:]}"
-#    dates.append(date)
-#print(dates)
-#"""
-#test.replace_cell('tiff_paths = f"{path}/tiffsflood/*.tif*"',replace_function_cell)
+# Change cell that calls module into a cell that runs the necessary code. This didn't work
+# replace_function_cell = """
+# tiff_paths = f"{path}/tiffsflood/*.tif*"
+# pths = glob(tiff_paths)
+# pths.sort()
+# dates = []
+# for pth in pths:
+#     date = os.path.basename(pth).split('_')[0]
+#     date = f"{date[:4]}-{date[4:6]}-{date[6:]}"
+#     dates.append(date)
+# print(dates)
+# """
+# test.replace_cell('tiff_paths = f"{path}/tiffsflood/*.tif*"',replace_function_cell)
 
 ######### TESTS ###########
 
