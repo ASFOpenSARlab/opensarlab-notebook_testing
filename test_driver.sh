@@ -48,7 +48,8 @@ conda deactivate
 ##Re-install and activate insar_analysis conda environment
 conda env create -f '/home/jovyan/conda_environments/Environment_Configs/insar_analysis_env.yml' --prefix "/home/jovyan/.local/envs/insar_analysis" --force
 conda run -n insar_analysis kernda --display-name insar_analysis -o /home/jovyan/.local/envs/insar_analysis/share/jupyter/kernels/python3/kernel.json
-source install_insar_analysis_pkgs.sh
+conda init
+source /home/jovyan/conda_environments/install_insar_analysis_pkgs.sh
 conda activate /home/jovyan/.local/envs/insar_analysis
 ## Run tests on notebooks that use insar_analysis environment
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
