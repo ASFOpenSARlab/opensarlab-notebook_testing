@@ -2,7 +2,7 @@
 
 from getpass import getpass
 import shutil
-
+from PIL import Image
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
 
@@ -96,49 +96,70 @@ else:
 '''
 test.add_test_cell("print('the shape of target tensor on training set is: {}'.format(y_test.shape))",test_target_test_tensor)
 
-# # Test build the network
-# test_net_summary = '''
-# actual_summary = str(net.summary())
-# expected_summary = '
-# Model: "model"
-# __________________________________________________________________________________________________
-# Layer (type)                    Output Shape         Param #     Connected to                     
-# ==================================================================================================
-# input_1 (InputLayer)            [(None, 3, 3, 6)]    0                                            
-# __________________________________________________________________________________________________
-# input_2 (InputLayer)            [(None, 3, 3, 6)]    0                                            
-# __________________________________________________________________________________________________
-# conv2d (Conv2D)                 (None, 1, 1, 32)     1760        input_1[0][0]                    
-# __________________________________________________________________________________________________
-# conv2d_1 (Conv2D)               (None, 1, 1, 32)     1760        input_2[0][0]                    
-# __________________________________________________________________________________________________
-# activation (Activation)         (None, 1, 1, 32)     0           conv2d[0][0]                     
-# __________________________________________________________________________________________________
-# activation_1 (Activation)       (None, 1, 1, 32)     0           conv2d_1[0][0]                   
-# __________________________________________________________________________________________________
-# reshape (Reshape)               (None, 1, 32)        0           activation[0][0]                 
-# __________________________________________________________________________________________________
-# reshape_1 (Reshape)             (None, 1, 32)        0           activation_1[0][0]               
-# __________________________________________________________________________________________________
-# concatenate (Concatenate)       (None, 2, 32)        0           reshape[0][0]                    
-#                                                                  reshape_1[0][0]                  
-# __________________________________________________________________________________________________
-# lstm (LSTM)                     (None, 128)          82432       concatenate[0][0]                
-# __________________________________________________________________________________________________
-# dense (Dense)                   (None, 32)           4128        lstm[0][0]                       
-# __________________________________________________________________________________________________
-# dense_1 (Dense)                 (None, 1)            33          dense[0][0]                      
-# ==================================================================================================
-# Total params: 90,113
-# Trainable params: 90,113
-# Non-trainable params: 0
-# __________________________________________________________________________________________________'
-# if actual_summary == expected_summary:
-#     test.log_test('p', f"actual_summary == {expected_summary}")
-# else:
-#     test.log_test('f', f"actual_summary == {actual_summary}, NOT {expected_summary}")
-# '''
-# test.add_test_cell("print('########## train the network... ##########')",test_net_summary)
+# Verify loss.png is created
+test_loss_png = '''
+if os.path.exists(f"{test_data_path}/loss.png"):
+    test.log_test('p', f"{test_data_path}/loss.png found")
+else:
+    test.log_test('f', f"{test_data_path}/loss.png NOT found")
+'''
+test.add_test_cell("plt.plot(loss)",test_loss_png)
+
+# Verify loss.png size
+test_loss_png_size = '''
+expected_loss_png_size = (1438,1244)
+loss_im_size = Image.open(f"{test_data_path}/loss.png")
+loss_png_size = loss_im_size.size
+if loss_png_size == expected_loss_png_size:
+    test.log_test('p', f"loss_png_size == (1438,1244)")
+else:
+    test.log_test('f', f"loss_png_size == {loss_png_size}, NOT (1438,1244)")
+'''
+test.add_test_cell("plt.plot(loss)",test_loss_png_size)
+
+# Verify change_map_probability.png is created
+test_change_map_probability_png = '''
+if os.path.exists(f"{test_data_path}/change_map_probability.png"):
+    test.log_test('p', f"{test_data_path}/change_map_ability.png found")
+else:
+    test.log_test('f', f"{test_data_path}/change_map_probability.png NOT found")
+'''
+test.add_test_cell("plt.imshow(change_map_prob)",test_change_map_probability_png)
+
+# Verify change_map_probability.png size
+test_change_map_probability_png_size = '''
+expected_change_map_probability_png_size = (1600,1400)
+change_map_probability_im_size = Image.open(f"{test_data_path}/change_map_probability.png")
+change_map_probability_png_size = change_map_probability_im_size.size
+if change_map_probability_png_size == expected_change_map_probability_png_size:
+    test.log_test('p', f"change_map_probability_png_size == (1600,1400)")
+else:
+    test.log_test('f', f"change_map_probability_png_size == {change_map_probability_png_size}, NOT (1600,1400)")
+'''
+test.add_test_cell("plt.imshow(change_map_prob)",test_change_map_probability_png_size)
+
+# Verify change_map_binary.png is created
+test_change_map_binary_png = '''
+if os.path.exists(f"{test_data_path}/change_map_binary.png"):
+    test.log_test('p', f"{test_data_path}/change_map_binary.png found")
+else:
+    test.log_test('f', f"{test_data_path}/change_map_binary.png NOT found")
+'''
+test.add_test_cell("plt.imshow(change_map_binary)",test_change_map_binary_png)
+
+# Verify change_map_binary.png size
+test_change_map_binary_png_size = '''
+expected_change_map_binary_png_size = (1600,1400)
+change_map_binary_im_size = Image.open(f"{test_data_path}/change_map_binary.png")
+change_map_binary_png_size = change_map_binary_im_size.size
+if change_map_binary_png_size == expected_change_map_binary_png_size:
+    test.log_test('p', f"change_map_binary_png_size == (1600,1400)")
+else:
+    test.log_test('f', f"change_map_binary_png_size == {change_map_binary_png_size}, NOT (1600,1400)")
+'''
+test.add_test_cell("plt.imshow(change_map_prob)",test_change_map_binary_png_size)
+
+
 
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
