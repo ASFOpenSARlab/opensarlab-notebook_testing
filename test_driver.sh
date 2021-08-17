@@ -11,12 +11,12 @@ if [ ! -d "/home/jovyan/opensarlab-notebook_testing/reports" ]; then
   mkdir /home/jovyan/opensarlab-notebook_testing/reports
 fi
 oldlogs="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/*.log"
-if [ -f "$oldlogs" ]; then
-   for f in $oldlogs
-   do
-      rm $f
-   done
-fi
+#if [ -f "$oldlogs" ]; then
+for f in $oldlogs
+  do
+  rm $f
+done
+#fi
 ## Re-install and activate rtc_analysis conda environment
 conda init bash
 source ~/.bashrc
@@ -55,6 +55,15 @@ conda activate /home/jovyan/.local/envs/insar_analysis
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
 ## Deactive insar_analysis environment
+conda deactivate
+##Re-install and activate the machine learning conda environment
+conda env create -f '/home/jovyan/conda_environments/Environment_Configs/machine_learning_env.yml' --prefix "/home/jovyan/.local/envs/machine_learning" --force
+conda run -n machine_learning kernda --display-name machine_learning -o /home/jovyan/.local/envs/machine_learning/share/jupyter/kernels/python3/kernel.json
+conda init
+conda activate /home/jovyan/.local/envs/machine_learning
+## Run tests on notebooks that use the machine_learning environment
+python /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detection.py
+## Deactive machine_learning environment
 conda deactivate
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'
