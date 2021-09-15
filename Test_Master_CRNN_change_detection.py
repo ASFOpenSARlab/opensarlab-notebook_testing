@@ -107,13 +107,14 @@ test.add_test_cell("plt.plot(loss)",test_loss_png)
 
 # Verify loss.png size
 test_loss_png_size = '''
-expected_loss_png_size = (1469,1244)
+expected_loss_png_size_1 = (1469,1244)
+expected_loss_png_size_2 = (1438,1244)
 loss_im_size = Image.open(f"{test_data_path}/loss.png")
 loss_png_size = loss_im_size.size
-if loss_png_size == expected_loss_png_size:
-    test.log_test('p', f"loss_png_size == (1469,1244)")
+if loss_png_size == expected_loss_png_size_1 or loss_png_size == expected_loss_png_size_2:
+    test.log_test('p', f"loss_png_size == (1469,1244) or (1438,1244)")
 else:
-    test.log_test('f', f"loss_png_size == {loss_png_size}, NOT (1469,1244)")
+    test.log_test('f', f"loss_png_size == {loss_png_size}, NOT (1469,1244) or (1438,1244)")
 '''
 test.add_test_cell("plt.plot(loss)",test_loss_png_size)
 
