@@ -39,6 +39,7 @@ skip_em = ["var kernel = Jupyter.notebook.kernel;",
            "date_picker = asfn.gui_date_picker(dates)",
            "project = asfn.filter_jobs_by_date(jobs, date_range)",
            "project = asfn.get_paths_orbits(project)",
+           "aoi = asfn.AOI_Selector(rasterstack, fig_xsize, fig_ysize)",
            "def write_dot_netrc(path, username, password):", #remove later so this cell runs
            "!$train_path/aps_weather_model.py -g {georef_path} 0 0", #remove later so this cell runs
            "!$train_path/aps_weather_model.py -g {georef_path} 1 1", #remove later so this cell runs
@@ -51,9 +52,7 @@ skip_em = ["var kernel = Jupyter.notebook.kernel;",
            "difference = np.subtract(im_c, im_u)", #remove later so this cell runs
            'print(f"original coordiante system = EPSG:{predominant_utm}")', #remove later so this cell runs
            'paths = f"{corrected_folder}/*.tif"', #remove later so this cell runs
-           "utm_zones, utm_types = get_utm_zones_types(tiff_paths)", #remove later so this cell runs
            "for file in tiff_paths:", #remove later so this cell runs
-           "utm_zones, utm_types = get_utm_zones_types(tiff_paths)", #remove later so this cell runs
            "pixels_lines = get_pixels_lines(tiff_paths)", #remove later so this cell runs
            "pickle.dump(to_pickle, outfile)" #remove later so this cell runs
            ]
@@ -86,6 +85,23 @@ _to_replace = "project_zips = jobs.download_files(ingram_folder)"
 _replacement = "project_zips = zip_paths"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
+# Replace the cell using the ! and bash commands within the function to get tiff paths
+_to_replace = 'def get_tiff_paths(paths):'
+_replacement = '''
+def get_tiff_paths(paths):
+    tiff_paths = glob.glob(paths)
+    return tiff_paths
+
+def print_tiff_paths(tiff_paths):
+    print("Tiff paths:", tiff_paths)
+'''
+test.replace_cell(_to_replace, _replacement)
+
+# Replace manually input coords from matplotlib plot with hardcoded test coords
+_to_replace = "    aoi_coords = [geolocation(aoi.x1, aoi.y1, geotrans, latlon=False), geolocation(aoi.x2, aoi.y2, geotrans, latlon=False)]"
+_replacement = "    aoi_coords = [geolocation(823.2718776795205, 1267.4977990512953, geotrans, latlon=False), geolocation(1885.9620005837792, 2669.4504964038615, geotrans, latlon=False)]"
+test.replace_line(_to_replace, _to_replace, _replacement)
+
 ######### TESTS ###########
 
 # Check that the data was downloaded from the S3 bucket
@@ -108,86 +124,114 @@ else:
 '''
 test.add_test_cell("project = asfn.filter_jobs_by_orbit(project, direction)", test_zip_paths)
 
-# # Verify all the expected amplitude geotiffs are present
-# test_amp_paths = '''
-# test_amp_pths = ['ingrams/S1AA_20161119T234106_20210720T234131_VVP1704_INT80_G_ueF_D006/S1AA_20161119T234106_20210720T234131_VVP1704_INT80_G_ueF_D006_amp.tif', 'ingrams/S1AA_20170106T234103_20210720T234131_VVP1656_INT80_G_ueF_24E9/S1AA_20170106T234103_20210720T234131_VVP1656_INT80_G_ueF_24E9_amp.tif', 'ingrams/S1AA_20170319T234100_20210720T234131_VVP1584_INT80_G_ueF_F049/S1AA_20170319T234100_20210720T234131_VVP1584_INT80_G_ueF_F049_amp.tif', 'ingrams/S1AA_20170506T234102_20210720T234131_VVP1536_INT80_G_ueF_74A6/S1AA_20170506T234102_20210720T234131_VVP1536_INT80_G_ueF_74A6_amp.tif', 'ingrams/S1AA_20170717T234106_20210720T234131_VVP1464_INT80_G_ueF_0785/S1AA_20170717T234106_20210720T234131_VVP1464_INT80_G_ueF_0785_amp.tif', 'ingrams/S1AA_20170903T234108_20210720T234131_VVP1416_INT80_G_ueF_1C5E/S1AA_20170903T234108_20210720T234131_VVP1416_INT80_G_ueF_1C5E_amp.tif', 'ingrams/S1AA_20171102T234109_20210720T234131_VVP1356_INT80_G_ueF_D66B/S1AA_20171102T234109_20210720T234131_VVP1356_INT80_G_ueF_D66B_amp.tif', 'ingrams/S1AA_20180101T234107_20210720T234131_VVP1296_INT80_G_ueF_CE38/S1AA_20180101T234107_20210720T234131_VVP1296_INT80_G_ueF_CE38_amp.tif', 'ingrams/S1AA_20180302T234106_20210720T234131_VVP1236_INT80_G_ueF_4C0D/S1AA_20180302T234106_20210720T234131_VVP1236_INT80_G_ueF_4C0D_amp.tif', 'ingrams/S1AA_20180501T234108_20210720T234131_VVP1176_INT80_G_ueF_9462/S1AA_20180501T234108_20210720T234131_VVP1176_INT80_G_ueF_9462_amp.tif', 'ingrams/S1AA_20180630T234111_20210720T234131_VVP1116_INT80_G_ueF_DE49/S1AA_20180630T234111_20210720T234131_VVP1116_INT80_G_ueF_DE49_amp.tif', 'ingrams/S1AA_20180817T234114_20210720T234131_VVP1068_INT80_G_ueF_0AE4/S1AA_20180817T234114_20210720T234131_VVP1068_INT80_G_ueF_0AE4_amp.tif', 'ingrams/S1AA_20181004T234116_20210720T234131_VVP1020_INT80_G_ueF_3CBA/S1AA_20181004T234116_20210720T234131_VVP1020_INT80_G_ueF_3CBA_amp.tif', 'ingrams/S1AA_20181203T234115_20210720T234131_VVP960_INT80_G_ueF_DD9A/S1AA_20181203T234115_20210720T234131_VVP960_INT80_G_ueF_DD9A_amp.tif', 'ingrams/S1AA_20190201T234113_20210720T234131_VVP900_INT80_G_ueF_F5FF/S1AA_20190201T234113_20210720T234131_VVP900_INT80_G_ueF_F5FF_amp.tif', 'ingrams/S1AA_20190402T234113_20210720T234131_VVP840_INT80_G_ueF_C23E/S1AA_20190402T234113_20210720T234131_VVP840_INT80_G_ueF_C23E_amp.tif', 'ingrams/S1AA_20190508T234114_20210720T234131_VVP804_INT80_G_ueF_6081/S1AA_20190508T234114_20210720T234131_VVP804_INT80_G_ueF_6081_amp.tif', 'ingrams/S1AA_20190707T234117_20210720T234131_VVP744_INT80_G_ueF_E971/S1AA_20190707T234117_20210720T234131_VVP744_INT80_G_ueF_E971_amp.tif', 'ingrams/S1AA_20190905T234121_20210720T234131_VVP684_INT80_G_ueF_1E13/S1AA_20190905T234121_20210720T234131_VVP684_INT80_G_ueF_1E13_amp.tif', 'ingrams/S1AA_20191104T234122_20210720T234131_VVP624_INT80_G_ueF_E145/S1AA_20191104T234122_20210720T234131_VVP624_INT80_G_ueF_E145_amp.tif', 'ingrams/S1AA_20200103T234120_20210720T234131_VVP564_INT80_G_ueF_5C2F/S1AA_20200103T234120_20210720T234131_VVP564_INT80_G_ueF_5C2F_amp.tif', 'ingrams/S1AA_20200303T234119_20210720T234131_VVP504_INT80_G_ueF_A376/S1AA_20200303T234119_20210720T234131_VVP504_INT80_G_ueF_A376_amp.tif', 'ingrams/S1AA_20200502T234120_20210720T234131_VVP444_INT80_G_ueF_7CE5/S1AA_20200502T234120_20210720T234131_VVP444_INT80_G_ueF_7CE5_amp.tif', 'ingrams/S1AA_20200701T234124_20210720T234131_VVP384_INT80_G_ueF_E040/S1AA_20200701T234124_20210720T234131_VVP384_INT80_G_ueF_E040_amp.tif', 'ingrams/S1AA_20200911T234128_20210720T234131_VVP312_INT80_G_ueF_8E33/S1AA_20200911T234128_20210720T234131_VVP312_INT80_G_ueF_8E33_amp.tif', 'ingrams/S1AA_20201110T234128_20210720T234131_VVP252_INT80_G_ueF_37B4/S1AA_20201110T234128_20210720T234131_VVP252_INT80_G_ueF_37B4_amp.tif', 'ingrams/S1AA_20210109T234126_20210720T234131_VVP192_INT80_G_ueF_AB84/S1AA_20210109T234126_20210720T234131_VVP192_INT80_G_ueF_AB84_amp.tif', 'ingrams/S1AA_20210310T234125_20210720T234131_VVP132_INT80_G_ueF_3720/S1AA_20210310T234125_20210720T234131_VVP132_INT80_G_ueF_3720_amp.tif', 'ingrams/S1AA_20210509T234127_20210720T234131_VVP072_INT80_G_ueF_B33E/S1AA_20210509T234127_20210720T234131_VVP072_INT80_G_ueF_B33E_amp.tif', 'ingrams/S1AA_20210708T234130_20210720T234131_VVP012_INT80_G_ueF_9196/S1AA_20210708T234130_20210720T234131_VVP012_INT80_G_ueF_9196_amp.tif']
-# if (amp_paths) == test_amp_pths:
-#     test.log_test('p', f"amp_paths == {test_amp_pths}")
-# else:
-#     test.log_test('f', f"amp_paths == {amp_paths}, NOT {test_amp_pths}")
-# '''
-# test.add_test_cell("amp_paths    = get_tiff_paths(amp_wild_path)", test_amp_paths)
+# Confirm initial paths to amplitude files
+test_amp_paths =''' 
+test_amp_pths ="['ingrams/S1BB_20200613T141253_20210103T141256_VVP204_INT80_G_ueF_DE52/S1BB_20200613T141253_20210103T141256_VVP204_INT80_G_ueF_DE52_amp.tif', 'ingrams/S1BB_20201222T141257_20210103T141256_VVP012_INT80_G_ueF_A80C/S1BB_20201222T141257_20210103T141256_VVP012_INT80_G_ueF_A80C_amp.tif', 'ingrams/S1BB_20200707T141254_20210103T141256_VVP180_INT80_G_ueF_E339/S1BB_20200707T141254_20210103T141256_VVP180_INT80_G_ueF_E339_amp.tif', 'ingrams/S1BB_20190526T141245_20210103T141256_VVP588_INT80_G_ueF_25B7/S1BB_20190526T141245_20210103T141256_VVP588_INT80_G_ueF_25B7_amp.tif', 'ingrams/S1BB_20191216T141251_20210103T141256_VVP384_INT80_G_ueF_04BE/S1BB_20191216T141251_20210103T141256_VVP384_INT80_G_ueF_04BE_amp.tif', 'ingrams/S1BB_20201128T141258_20210103T141256_VVP036_INT80_G_ueF_D855/S1BB_20201128T141258_20210103T141256_VVP036_INT80_G_ueF_D855_amp.tif', 'ingrams/S1BB_20200321T141249_20210103T141256_VVP288_INT80_G_ueF_F2E0/S1BB_20200321T141249_20210103T141256_VVP288_INT80_G_ueF_F2E0_amp.tif','ingrams/S1BB_20200812T141256_20210103T141256_VVP144_INT80_G_ueF_6FC6/S1BB_20200812T141256_20210103T141256_VVP144_INT80_G_ueF_6FC6_amp.tif', 'ingrams/S1BB_20201104T141258_20210103T141256_VVP060_INT80_G_ueF_EA59/S1BB_20201104T141258_20210103T141256_VVP060_INT80_G_ueF_EA59_amp.tif', 'ingrams/S1BB_20200202T141249_20210103T141256_VVP336_INT80_G_ueF_2668/S1BB_20200202T141249_20210103T141256_VVP336_INT80_G_ueF_2668_amp.tif', 'ingrams/S1BB_20190408T141243_20210103T141256_VVP636_INT80_G_ueF_0DD4/S1BB_20190408T141243_20210103T141256_VVP636_INT80_G_ueF_0DD4_amp.tif', 'ingrams/S1BB_20200508T141251_20210103T141256_VVP240_INT80_G_ueF_2F16/S1BB_20200508T141251_20210103T141256_VVP240_INT80_G_ueF_2F16_amp.tif', 'ingrams/S1BB_20190725T141249_20210103T141256_VVP528_INT80_G_ueF_9805/S1BB_20190725T141249_20210103T141256_VVP528_INT80_G_ueF_9805_amp.tif', 'ingrams/S1BB_20191122T141252_20210103T141256_VVP408_INT80_G_ueF_50ED/S1BB_20191122T141252_20210103T141256_VVP408_INT80_G_ueF_50ED_amp.tif', 'ingrams/S1BB_20201011T141258_20210103T141256_VVP084_INT80_G_ueF_1BC5/S1BB_20201011T141258_20210103T141256_VVP084_INT80_G_ueF_1BC5_amp.tif']"
+if str(amp_paths) == test_amp_pths:
+    test.log_test('p', f"amp_paths == {test_amp_pths}")
+else:
+    test.log_test('f', f"amp_paths == {amp_paths}, NOT {test_amp_pths}")
+'''
+test.add_test_cell("amp_paths = get_tiff_paths(amp_wild_path)", test_amp_paths)
 
-# # Confirm creation of tindex
-# test_tindex = """
-# if type(tindex) == pd.core.indexes.datetimes.DatetimeIndex:
-#     test.log_test('p', f"type(tindex) == pd.core.indexes.datetimes.DatetimeIndex")
-# else:
-#     test.log_test('f', f"type(tindex) == {type(tindex)}, NOT pd.core.indexes.datetimes.DatetimeIndex")
-# if tindex.size == 70:
-#     test.log_test('p', f"tindex.size == 70")
-# else:
-#     test.log_test('f', f"tindex.size == {tindex.size}, NOT 70")
-# """
-# test.add_test_cell("tindex = pd.DatetimeIndex(dates)", test_tindex)
+# Confirm correct average heading
+test_avg_hdg = '''
+test_average_heading = "194.40839831999998"
+if str(heading_avg) == test_average_heading:
+    test.log_test('p', f"heading_avg == {test_average_heading}")
+else:
+    test.log_test('f', f"heading_avg == {heading_avg}, NOT {test_average_heading}")
+'''
+test.add_test_cell("heading_avg = np.mean(list(headings.values()))", test_avg_hdg)
 
-# # Confirm raster_stack == (1270, 1547)
-# test_raster = """
-# if raster.shape == (1270, 1547):
-#     test.log_test('p', f"raster.shape == (1270, 1547)")
-# else:
-#     test.log_test('f', f"raster.shape == {raster.shape}, NOT (1270, 1547)")
-# """
-# test.add_test_cell("raster = band.ReadAsArray()", test_raster)
+# Confirm predominant UTM zone
+test_predom_utm = '''
+expected_utm = "32610"
+if str(predominant_utm) == expected_utm:
+    test.log_test('p', f"predominant_utm == {expected_utm}")
+else:
+    test.log_test('f', f"predominant_utm == {predominant_utm}, NOT {expected_utm}")
+'''
+test.add_test_cell("predominant_utm = utm_unique[a][0]", test_predom_utm)
 
-# # Confirm creation of plots_and_products directory
-# test_product_path = """
-# if os.path.exists(f"{test_data_path}/{product_path}"):
-#     test.log_test('p', f"{test_data_path}/{product_path} directory found")
-# else:
-#     test.log_test('f', f"{test_data_path}/{product_path} directory NOT found")
-# """
-# test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+# Confirm single UTM zone
+test_single_utm = '''
+expected_num_utm = "1"
+if str(len(utm_unique)) == expected_num_utm:
+    test.log_test('p', f"Expected number of UTM zones == {expected_num_utm}")
+else:
+    test.log_test('f', f"Expected number of UTM zones == {len(utm_unique)}, NOT {expected_num_utm}")
+'''
+test.add_test_cell("predominant_utm = utm_unique[a][0]", test_single_utm)
 
-# # Confirm creation of animation.gif
-# test_animation_gif = """
-# if os.path.exists(f"{test_data_path}/{product_path}/animation.gif"):
-#     test.log_test('p', f"{test_data_path}/{product_path}/animation.gif found")
-# else:
-#     test.log_test('f', f"{test_data_path}/{product_path}/animation.gif NOT found")
-# """
-# test.add_test_cell("ani.save('animation.gif', writer='pillow', fps=2)", test_animation_gif)
-# #test.add_test_cell("ani.save('NepalTimeSeriesAnimation.gif', writer='pillow', fps=2)", test_animation_gif)
+# Confirm existence of full_scene.tif for AOI selector
+test_full_scene_tif = '''
+if os.path.exists(f"{analysis_directory}/full_scene.tif"):
+    test.log_test("p", f"File full_scene.tif for AOI selector tool exists in {analysis_directory}!")
+else:
+    test.log_test("f", f"File full_scene.tif for AOI selector tool does not exist in {analysis_directory}!")
+'''
+test.add_test_cell("if os.path.exists(full_scene):", test_full_scene_tif)
 
-# # Confirm rs_means_pwr.shape == (70,)
-# test_rs_means_pwr = """
-# if rs_means_pwr.shape == (70,):
-#     test.log_test('p', f"rs_means_pwr.shape == (70,)")
-# else:
-#     test.log_test('f', f"rs_means_pwr.shape == {rs_means_pwr.shape}, NOT (70,)")
-# """
-# test.add_test_cell("rs_means_pwr.shape", test_rs_means_pwr)
+# Confirm AOI coordinate transformation
+test_geographic_coords = ''' 
+expected_coords = "[[571661.7502143616, 5204960.176075896], [656676.9600467023, 5092803.960287691]]"
+if str(aoi_coords) == expected_coords:
+    test.log_test('p', f"Expected AOI geographic coordinates == {expected_coords}")
+else:
+    test.log_test('f', f"Expected AOI geographic coordinated == {aoi_coords}, NOT {expected_coords}")   
+'''
+test.add_test_cell("except TypeError:", test_geographic_coords)
 
-# # Confirm creation of time_series_means.png
-# test_time_series_means_png = """
-# if os.path.exists(f"{test_data_path}/{product_path}/time_series_means.png"):
-#     test.log_test('p', f"{test_data_path}/{product_path}/time_series_means.png found")
-# else:
-#     test.log_test('f', f"{test_data_path}/{product_path}/time_series_means.png NOT found")
-# """
-# test.add_test_cell("plt.savefig('time_series_means', dpi=72, transparent='true')",
-#                    test_time_series_means_png)
+# Confirm number of subset tifs
+test_number_tifs = '''
+expected_num_tifs = "45"
+actual_num_tifs = len(subset_paths)
+if str(len(subset_paths)) == expected_num_tifs:
+    test.log_test('p', f"Number of subset tifs == {expected_num_tifs}")
+else:
+    test.log_test('f', f"Number of subset tifs == {actual_num_tifs}, NOT {expected_num_tifs}")
+'''
+test.add_test_cell("def get_pixels_lines(geotiff_paths: list) -> list:", test_number_tifs)
 
-# # Confirm creation of animation_histogram.gif
-# test_animation__histogram_gif = """
-# if os.path.exists(f"{test_data_path}/{product_path}/animation_histogram.gif"):
-#     test.log_test('p', f"{test_data_path}/{product_path}/animation_histogram.gif found")
-# else:
-#     test.log_test('f', f"{test_data_path}/{product_path}/animation_histogram.gif NOT found")
-# """
-# #test.add_test_cell("ani.save('NepalTSAnimation_means.gif', writer='pillow', fps=2)", test_animation__histogram_gif)
-# test.add_test_cell("ani.save('animation_histogram.gif', writer='pillow', fps=2)", test_animation__histogram_gif)
+# Confirm dimensions of subset tifs
+test_dimensions_tifs = '''
+expected_dimensions_tifs = "{'pixels': {1063}, 'lines': {1402}}"
+if str(dimensions) == expected_dimensions_tifs:
+    test.log_test('p', f"Dimensions of subset tifs == {expected_dimensions_tifs}")
+else:
+    test.log_test('f', f"Dimensions of subset tifs == {dimensions}, NOT {expected_dimensions_tifs}")
+'''
+test.add_test_cell("def get_pixels_lines(geotiff_paths: list) -> list:", test_dimensions_tifs)
 
+# Confirm value of UTC int form
+test_utc_int = '''
+expected_utc_int = "51172.0"
+if str(c_l_utc) == expected_utc_int:
+    test.log_test('p', f"UTC in int form == {expected_utc_int}")
+else:
+    test.log_test('f', f"UTC in int form == {c_l_utc}, NOT {expected_utc_int}")
+'''
+test.add_test_cell("utc_sat, c_l_utc = getUTC_sat(unw_paths)", test_utc_int)
+
+# Confirm value of UTC human-readable form
+test_utc_human = '''
+expected_utc_human = "14:12"
+if str(utc_sat) == expected_utc_human:
+    test.log_test('p', f"UTC in int form == {expected_utc_human}")
+else:
+    test.log_test('f', f"UTC in int form == {utc_sat}, NOT {expected_utc_human}")
+'''
+test.add_test_cell("utc_sat, c_l_utc = getUTC_sat(unw_paths)", test_utc_human)
+
+# Confirm existence of parms_aps.txt
+test_parms_aps_txt = '''
+if os.path.exists(f"{analysis_directory}/parms_aps.txt"):
+    test.log_test("p", f"TRAIN info file parms_aps.txt exists in {analysis_directory}!")
+else:
+    test.log_test("f", f"TRAIN info file parms_aps.txt does not exist in {analysis_directory}!")
+'''
+test.add_test_cell("!mkdir -p {merra2_datapath} # create the directory", test_parms_aps_tif)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 
