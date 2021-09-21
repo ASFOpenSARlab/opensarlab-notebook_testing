@@ -336,10 +336,10 @@ test.add_test_cell("cor_paths = get_tiff_paths(paths_cor)", test_corrected_tifs)
 test_corrected_numpy = '''
 #expected_corr_mean = "-0.7425961494445801"
 expected_corr_mean = "-0.7426"
-if str(np.around(np.mean(im_c)), decimals = 4) == expected_corr_mean:
-    test.log_test('p', f"np.mean(im_c) == {expected_corr_mean}")
+if str(np.around((np.mean(im_c)), decimals = 4)) == expected_corr_mean:
+    test.log_test('p', f"np.around((np.mean(im_c)), decimals = 4) == {expected_corr_mean}")
 else:
-    test.log_test('f', f"np.mean(im_c) == {np.mean(im_c)}, NOT {expected_corr_mean}")
+    test.log_test('f', f"np.around((np.mean(im_c)), decimals = 4) == {np.around((np.mean(im_c)), decimals = 4)}, NOT {expected_corr_mean}")
 '''
 test.add_test_cell("im_c = corrected.GetRasterBand(1).ReadAsArray()",test_corrected_numpy)
 
@@ -347,21 +347,21 @@ test.add_test_cell("im_c = corrected.GetRasterBand(1).ReadAsArray()",test_correc
 test_uncorrected_numpy = '''
 #expected_uncorr_mean = "5.195372104644775"
 expected_uncorr_mean = "5.1954"
-if str(np.around(np.mean(im_u)), decimals = 4) == expected_uncorr_mean:
-    test.log_test('p', f"np.mean(im_u) == {expected_uncorr_mean}")
+if str(np.around((np.mean(im_u)), decimals = 4)) == expected_uncorr_mean:
+    test.log_test('p', f"np.around((np.mean(im_u)), decimals = 4) == {expected_uncorr_mean}")
 else:
-    test.log_test('f', f"np.mean(im_u) == {np.mean(im_u)}, NOT {expected_uncorr_mean}")
+    test.log_test('f', f"np.around((np.mean(im_u)), decimals = 4) == {np.around((np.mean(im_u)), decimals = 4)}, NOT {expected_uncorr_mean}")
 '''
 test.add_test_cell("im_u = uncorrected.GetRasterBand(1).ReadAsArray()",test_uncorrected_numpy)
 
 # Confirm mean value of difference numpy array
 test_difference_numpy = '''
 #expected_difference_mean = "-5.937968730926514"
-expected_difference_mean = "-5.9380"
-if str(np.around(np.mean(difference)), decimals = 4) == expected_difference_mean:
-    test.log_test('p', f"np.mean(difference) == {expected_difference_mean}")
+expected_difference_mean = "-5.93797"
+if str(np.around((np.mean(difference)), decimals = 5)) == expected_difference_mean:
+    test.log_test('p', f"np.around((np.mean(difference)), decimals = 5) == {expected_difference_mean}")
 else:
-    test.log_test('f', f"np.mean(difference) == {np.mean(difference)}, NOT {expected_difference_mean}")
+    test.log_test('f', f"np.around((np.mean(difference)), decimals = 5) == {np.around((np.mean(difference)), decimals = 5)}, NOT {expected_difference_mean}")
 '''
 test.add_test_cell("difference = np.subtract(im_c, im_u)",test_difference_numpy)
 
