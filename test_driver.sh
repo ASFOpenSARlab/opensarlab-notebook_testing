@@ -54,7 +54,7 @@ conda activate /home/jovyan/.local/envs/insar_analysis
 ## Run tests on notebooks that use insar_analysis environment
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
-## Deactive insar_analysis environment
+## Deactivate insar_analysis environment
 conda deactivate
 ##Re-install and activate the machine learning conda environment
 conda env create -f '/home/jovyan/conda_environments/Environment_Configs/machine_learning_env.yml' --prefix "/home/jovyan/.local/envs/machine_learning" --force
@@ -63,7 +63,7 @@ conda init
 conda activate /home/jovyan/.local/envs/machine_learning
 ## Run tests on notebooks that use the machine_learning environment
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detection.py
-## Deactive machine_learning environment
+## Deactivate machine_learning environment
 conda deactivate
 ##Re-install and activate the train conda environment
 conda env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
@@ -72,7 +72,7 @@ conda init
 conda activate /home/jovyan/.local/envs/train
 ## Run tests on notebooks that use the train environment
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS_657_2019_Lab9_InSARTimeSeriesAnalysis_Part1_DataDownload_HyP3_v2.py
-## Deactive train environment
+## Deactivate train environment
 conda deactivate
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'

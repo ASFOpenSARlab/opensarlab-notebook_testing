@@ -334,8 +334,9 @@ test.add_test_cell("cor_paths = get_tiff_paths(paths_cor)", test_corrected_tifs)
 
 # Confirm mean value of corrected numpy array
 test_corrected_numpy = '''
-expected_corr_mean = "-0.7407214"
-if str(np.mean(im_c)) == expected_corr_mean:
+#expected_corr_mean = "-0.7425961494445801"
+expected_corr_mean = "-0.7426"
+if str(np.around(np.mean(im_c)), decimals = 4) == expected_corr_mean:
     test.log_test('p', f"np.mean(im_c) == {expected_corr_mean}")
 else:
     test.log_test('f', f"np.mean(im_c) == {np.mean(im_c)}, NOT {expected_corr_mean}")
@@ -344,8 +345,9 @@ test.add_test_cell("im_c = corrected.GetRasterBand(1).ReadAsArray()",test_correc
 
 # Confirm mean value of uncorrected numpy array
 test_uncorrected_numpy = '''
-expected_uncorr_mean = "5.195372104644775"
-if str(np.mean(im_u)) == expected_uncorr_mean:
+#expected_uncorr_mean = "5.195372104644775"
+expected_uncorr_mean = "5.1954"
+if str(np.around(np.mean(im_u)), decimals = 4) == expected_uncorr_mean:
     test.log_test('p', f"np.mean(im_u) == {expected_uncorr_mean}")
 else:
     test.log_test('f', f"np.mean(im_u) == {np.mean(im_u)}, NOT {expected_uncorr_mean}")
@@ -354,8 +356,9 @@ test.add_test_cell("im_u = uncorrected.GetRasterBand(1).ReadAsArray()",test_unco
 
 # Confirm mean value of difference numpy array
 test_difference_numpy = '''
-expected_difference_mean = "-5.957501"
-if str(np.mean(difference)) == expected_difference_mean:
+#expected_difference_mean = "-5.937968730926514"
+expected_difference_mean = "-5.9380"
+if str(np.around(np.mean(difference)), decimals = 4) == expected_difference_mean:
     test.log_test('p', f"np.mean(difference) == {expected_difference_mean}")
 else:
     test.log_test('f', f"np.mean(difference) == {np.mean(difference)}, NOT {expected_difference_mean}")
