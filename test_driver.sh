@@ -11,12 +11,12 @@ if [ ! -d "/home/jovyan/opensarlab-notebook_testing/reports" ]; then
   mkdir /home/jovyan/opensarlab-notebook_testing/reports
 fi
 oldlogs="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/*.log"
-#if [ -f "$oldlogs" ]; then
-for f in $oldlogs
-  do
-  rm $f
-done
-#fi
+if [ -f "$oldlogs" ]; then
+  for f in $oldlogs
+    do
+      rm $f
+    done
+fi
 ## Re-install and activate rtc_analysis conda environment
 conda init bash
 source ~/.bashrc
@@ -37,11 +37,8 @@ python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
-python /home/jovyan/opensarlab-notebook_testing/Test_ASF_Projects_Prepare_Data_Stack_Hyp3_no_group.py
 python /home/jovyan/opensarlab-notebook_testing/Test_ASF_Projects_Subset_Data_Stack.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Master_Prepare_Data_Stack_Hyp3_no_group.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_Subset_Data_Stack.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Prepare_Data_Stack_Hyp3_no_group.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Subset_Data_Stack.py
 ## Deactivate rtc_analysis environment
 conda deactivate
