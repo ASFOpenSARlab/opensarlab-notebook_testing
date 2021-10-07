@@ -13,7 +13,7 @@ import os
 ######### INITIAL SETUP #########
 
 # Define path to notebook and create ASFNotebookTest object
-notebook_pth = r"/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/GEOS 657-Lab9-InSARTimeSeriesAnalysis-Part1-DataDownload-HyP3_v2.ipynb"
+notebook_pth = r"/home/jovyan/GEOS_657_Labs/2019/GEOS 657-Lab9-InSARTimeSeriesAnalysis-Part1-DataDownload-HyP3_v2.ipynb"
 log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
