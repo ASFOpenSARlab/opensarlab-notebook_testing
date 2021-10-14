@@ -10,13 +10,10 @@ fi
 if [ ! -d "/home/jovyan/opensarlab-notebook_testing/reports" ]; then
   mkdir /home/jovyan/opensarlab-notebook_testing/reports
 fi
-oldlogs="/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/*.log"
-if [ -f "$oldlogs" ]; then
-  for f in $oldlogs
-    do
-      rm $f
-    done
-fi
+# Remove old logs
+for f in /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/*.log; do
+    rm $f
+done
 ## Re-install and activate rtc_analysis conda environment
 conda init bash
 source ~/.bashrc
@@ -62,15 +59,15 @@ conda activate /home/jovyan/.local/envs/machine_learning
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detection.py
 ## Deactivate machine_learning environment
 conda deactivate
-##Re-install and activate the train conda environment
-conda env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
-conda run -n train kernda --display-name train -o /home/jovyan/.local/envs/train/share/jupyter/kernels/python3/kernel.json
-conda init
-conda activate /home/jovyan/.local/envs/train
-## Run tests on notebooks that use the train environment
-python /home/jovyan/opensarlab-notebook_testing/Test_GEOS_657_2019_Lab9_InSARTimeSeriesAnalysis_Part1_DataDownload_HyP3_v2.py
-## Deactivate train environment
-conda deactivate
+# ##Re-install and activate the train conda environment
+# conda env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
+# conda run -n train kernda --display-name train -o /home/jovyan/.local/envs/train/share/jupyter/kernels/python3/kernel.json
+# conda init
+# conda activate /home/jovyan/.local/envs/train
+# ## Run tests on notebooks that use the train environment
+# python /home/jovyan/opensarlab-notebook_testing/Test_GEOS_657_2019_Lab9_InSARTimeSeriesAnalysis_Part1_DataDownload_HyP3_v2.py
+# ## Deactivate train environment
+# conda deactivate
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'
 ## Get rid of spaces in log filenames
