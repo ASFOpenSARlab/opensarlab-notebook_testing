@@ -2,8 +2,6 @@
 
 from getpass import getpass
 import shutil
-from pathlib import Path
-#import asf_notebook as asfn 
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io

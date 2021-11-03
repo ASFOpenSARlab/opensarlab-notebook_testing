@@ -2,7 +2,6 @@
 
 from getpass import getpass
 import shutil
-from pathlib import Path
 from PIL import Image
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
