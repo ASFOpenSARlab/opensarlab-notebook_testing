@@ -15,12 +15,13 @@ test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = 'path = Path("/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_Ex2-4_S1-MadreDeDios")'
-_replacement = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios")'
+_replacement = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/ecosystems_data_Ex2-4_S1-MadreDeDios")'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/ecosystems_data_Ex2-4_S1-MadreDeDios"
 try:
-   shutil.rmtree(path)
+   shutil.rmtree(test_data_path)
 except:
    pass
 

@@ -19,6 +19,7 @@ _replacement = 'analysis_dir = Path(f"/home/jovyan/opensarlab-notebook_testing/n
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex1"
 try:
    shutil.rmtree(test_data_path)
 except:

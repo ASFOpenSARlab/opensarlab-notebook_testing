@@ -5,9 +5,6 @@ import shutil
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
-from pip._internal import main as pipmain
-
-pipmain(['install', 'astor'])
 
 ######### INITIAL SETUP #########
 
@@ -18,11 +15,11 @@ test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
 _to_replace = 'path = Path("/home/jovyan/notebooks/SAR_Training/English/Master/data_Change_Detection_Amplitude_Time_Series_Example")'
-test_data_path = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example")'
-_replacement = test_data_path
+_replacement = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example")'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example"
 try:
    shutil.rmtree(test_data_path)
 except:
