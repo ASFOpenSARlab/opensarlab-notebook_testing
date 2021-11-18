@@ -37,7 +37,6 @@ python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
 #python /home/jovyan/opensarlab-notebook_testing/Test_ASF_Projects_Subset_Data_Stack.py
 python /home/jovyan/opensarlab-notebook_testing/Test_Master_Subset_Data_Stack.py
-#python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Subset_Data_Stack.py
 ## Deactivate rtc_analysis environment
 conda deactivate
 ##Re-install and activate insar_analysis conda environment
