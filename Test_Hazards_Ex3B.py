@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-from pip._internal import main as pipmain
-pipmain(['install', 'astor'])
-
 from getpass import getpass
 import shutil
 
