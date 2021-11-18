@@ -65,7 +65,7 @@ if Path(f"{datadirectory}").exists():
 else:
     test.log_test('f', f"{datadirectory} does NOT Exist")
 """
-test.add_test_cell("# !ls *.vrt #Uncomment this line to see a List of the files ", test_datadirectory)
+test.add_test_cell("# !ls {datadirectory}/*vrt #Uncomment this line to see a List of the files", test_datadirectory)
 
 # Confirm tindex has dtype = datetime64[ns], freq = None, and length = 70
 test_tindex = """
