@@ -40,7 +40,7 @@ _replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTest
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Skip all cells inputing user defined values for filtering products to download
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/machine_learning':"]
 
 for search_str in skip_em:

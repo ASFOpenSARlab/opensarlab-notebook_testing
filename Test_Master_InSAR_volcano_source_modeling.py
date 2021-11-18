@@ -28,7 +28,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/insar_analysis':"]
            
 for search_str in skip_em:

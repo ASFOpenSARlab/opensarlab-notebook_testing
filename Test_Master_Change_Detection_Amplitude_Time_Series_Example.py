@@ -26,7 +26,7 @@ except:
    pass
 
 # Skip all cells inputing user defined values for filtering products to download
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
