@@ -136,6 +136,16 @@ else:
 """
 test.add_test_cell("metric_keys = metrics.keys()", test_metric_keys)
 
+# Confirm creation of thresh_percentilerange_histogram.png
+test_thresh_percentilerange_histogram_png = """
+if Path(f"{product_path}/thresh_percentilerange_histogram.png").exists():
+    test.log_test('p', f"{product_path}/thresh_percentilerange_histogram.png found")
+else:
+    test.log_test('f', f"{product_path}/thresh_percentilerange_histogram.png NOT found")
+"""
+test.add_test_cell("plt.savefig(product_path/'thresh_percentilerange_histogram.png',", 
+                   test_thresh_percentilerange_histogram_png)
+
 # Confirm creation of changes_percentilerange_threshold.png
 test_changes_percentilerange_threshold_png = """
 if Path(f"{product_path}/changes_percentilerange_threshold.png").exists():
@@ -143,7 +153,7 @@ if Path(f"{product_path}/changes_percentilerange_threshold.png").exists():
 else:
     test.log_test('f', f"{product_path}/changes_percentilerange_threshold.png NOT found")
 """
-test.add_test_cell("plt.savefig(product_path/'thresh_percentilerange_histogram.png',", 
+test.add_test_cell("plt.savefig(product_path/'changes_percentilerange_threshold.png',", 
                    test_changes_percentilerange_threshold_png)
 
 # Confirm creation of changes_var_threshold.png
