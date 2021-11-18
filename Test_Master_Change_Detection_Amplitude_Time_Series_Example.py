@@ -33,17 +33,17 @@ for search_str in skip_em:
     test.replace_cell(search_str)
     
 # Replace download cell with explicit path. Why is this required to make the download work???
-_replacement = '!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example/Niamey.zip'
+_replacement = '!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example/Niamey.zip'
 test.replace_cell('!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip $path/Niamey.zip', _replacement)
 
 # Explicitly define the path to cra. Why is this necessary???
 _to_replace = "cra_path = niamey_path.cwd()/'data_Change_Detection_Amplitude_Time_Series_Example/cra'"
-_replacement = "cra_path = Path('/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example/cra')"
+_replacement = "cra_path = Path('/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example/cra')"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Explicitly define the product path
 _to_replace = "product_path = path.cwd()/'data_Change_Detection_Amplitude_Time_Series_Example/plots_and_products'"
-_replacement = "product_path = Path('/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example/plots_and_products')"
+_replacement = "product_path = Path('/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example/plots_and_products')"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 ######## TESTS ###########
@@ -59,7 +59,7 @@ test.add_test_cell('if not path.is_dir():', test_working_dir)
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example/Niamey.zip").exists():
+if Path(f"{path}/Niamey.zip").exists():
     test.log_test('p', "Niamey.zip successfully copied from s3://asf-jupyter-data/Niamey.zip")
 else:
     test.log_test('f', "Niamey.zip NOT copied from s3://asf-jupyter-data/Niamey.zip")
@@ -68,7 +68,7 @@ test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jup
 
 # Confirm that all expected files were extracted from the zip
 test_zip_extraction = """
-cra_path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Change_Detection_Amplitude_Time_Series_Example/cra/")
+cra_path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example/cra/")
 test_vrt_qty = len(list(cra_path.glob("S*.vrt")))
 if test_vrt_qty == 134:
     test.log_test('p', f"134 vrts extracted, as expected")
