@@ -672,7 +672,7 @@ test.add_test_cell("plt.savefig(product_path/'change_point_thresh', dpi=300, tra
 
 # Confirm creation of change_point_thresh.tiff
 test_change_point_thresh_tiff = """
-if os.path.exists("change_point_thresh.tiff"):
+if Path(f"{product_path}/change_point_thresh.tiff").exists():
     test.log_test('p', f"change_point_thresh.tiff found")
 else:
     test.log_test('f', f"change_point_thresh.tiff NOT found")
