@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 from getpass import getpass
+from pathlib import Path
 import shutil
 import glob
-import os
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -16,82 +16,70 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = 'path = path = f"/home/jovyan/notebooks/SAR_Training/English/HydroSAR/{name}"'
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hydrosar_data_time_series_example/Bangladesh"
-_replacement = f"    path = \"{test_data_path}\""
-test.replace_line('path = path = f"/home/jovyan/notebooks/SAR_Training/English/HydroSAR/{name}"', _to_replace, _replacement)
+_to_replace = 'path = Path(f"/home/jovyan/notebooks/SAR_Training/English/HydroSAR/{name}")'
+_replacement = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hydrosar_test_Lab1")'
+test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hydrosar_test_Lab1"
 try:
-   shutil.rmtree(test_data_path)
+   shutil.rmtree(str(test_data_path))
 except:
    pass
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
 skip_em = ["var kernel = Jupyter.notebook.kernel;",
-           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"] #This didn't work,
-#            "def get_dates_sub(path):",#This didn't work
-#            'tiff_paths = f"{path}/tiffsflood/*.tif*"']
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
     test.replace_cell(search_str)
     
-# Change cell that calls module into a cell that runs the necessary code. This didn't work
-# replace_function_cell = """
-# tiff_paths = f"{path}/tiffsflood/*.tif*"
-# pths = glob(tiff_paths)
-# pths.sort()
-# dates = []
-# for pth in pths:
-#     date = os.path.basename(pth).split('_')[0]
-#     date = f"{date[:4]}-{date[4:6]}-{date[6:]}"
-#     dates.append(date)
-# print(dates)
-# """
-# test.replace_cell('tiff_paths = f"{path}/tiffsflood/*.tif*"',replace_function_cell)
+# Replace manually input coords from matplotlib plot with hardcoded test coords
+_to_replace = "sarloc = (ceil(my_plot.x), ceil(my_plot.y))"
+_replacement = "sarloc = (2204, 670)"
+test.replace_line(_to_replace, _to_replace, _replacement)
 
 ######### TESTS ###########
 
-# Confirm we are in datadirectoy
+# Confirm data directory exists
 test_datadirectory = """
-if os.getcwd() == f"{test_data_path}":
-    test.log_test('p', f"os.getcwd() == {test_data_path}")
+if Path(f"{path}").exists():
+    test.log_test('p', f"{path} exists!")
 else:
-    test.log_test('f', f"os.getcwd() == {os.getcwd()}, NOT {test_data_path}")
+    test.log_test('f', f"{path} does NOT exist!")
 """
-test.add_test_cell("os.chdir(path)", test_datadirectory)
+test.add_test_cell("if not path.exists():", test_datadirectory)
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if os.path.exists(f"{os.getcwd()}/{time_series}"):
-    test.log_test('p', f"{time_series} successfully copied from {time_series_path}")
+if Path(f"{path}/tiffsflood").exists():
+    test.log_test('p', f"Bangladesh.tar.gz successfully copied from {time_series_path}")
 else:
-    test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
+    test.log_test('f', f"Bangladesh.tar.gz NOT copied from {time_series_path}")
 """
 test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm we have extracted 16 tiff files from the tarball
 test_extract = """
-import glob
-test_extracted_path = \"tiffsflood/*.tiff\"
+test_extracted_path = f"{path}/tiffsflood/*.tiff"
 test_len = len(glob.glob(test_extracted_path))
 if test_len == 16:
     test.log_test('p', f"{test_len} tiffs extracted from {time_series_path}")
 else:
     test.log_test('f', f"Expected 16 tiffs extracted from tarball, found {test_len}")
 """
-test.add_test_cell("!tar -xvzf {name}.tar.gz", test_extract)
+test.add_test_cell("!tar -xvzf {name}.tar.gz -C {path}", test_extract)
 
 # Confirm dates hold correct values Cell 19 is giving "EXCEPTION: cell 19, 'module' object is not callable"
 test_dates = """
 test_dates_1 = ['2020-06-03', '2020-06-12', '2020-06-15', '2020-06-24', '2020-06-27', '2020-07-06', '2020-07-09', '2020-07-12', '2020-07-18', '2020-07-21', '2020-07-24', '2020-07-27', '2020-07-30', '2020-08-02', '2020-08-11', '2020-08-14']
-if dates == test_dates:
+if dates == test_dates_1:
     test.log_test('p', f"dates == {test_dates_1}")
 else:
     test.log_test('f', f"dates == {dates}, NOT {test_dates_1}")
 """
-test.add_test_cell("    dates = get_dates_sub(tiff_paths)", test_dates)
+test.add_test_cell("dates = get_dates_sub(tiff_paths) if flevent == 1 else get_dates(tiff_paths)", test_dates)
 
 # Confirm stackBangladesh_VV.vrt is a vrt, has 16 bands, 3382 pixels, and 3255 lines
 test_img = """
@@ -113,16 +101,25 @@ if img.RasterYSize == 3255:
 else:
     test.log_test('f', f"img.RasterYSize == {img.RasterYSize}, NOT 3255")
 """
-test.add_test_cell("img = gdal.Open(image_file)", test_img)
+test.add_test_cell("img = gdal.Open(str(image_file))", test_img)
 
-## Confirm raster is in dB # Figure out how to do this
-#test_caldB = """
-#if raster.shape == (16, 600, 600):
-#    test.log_test('p', f"raster.shape == (16, 600, 600)")
-#else:
-#    test.log_test('f', f"raster.shape == {caldB.shape}, NOT (16, 600, 600)")
-#"""
-#test.add_test_cell("use_dB = True", test_caldB)
+# Confirm existence of vrt file
+test_vrt = """
+if Path(f"{path}/stack{name}_{polarization}.vrt").exists():
+    test.log_test('p', f"{path}/stack{name}_{polarization}.vrt exists!")
+else:
+    test.log_test('f', f"{path}/stack{name}_{polarization}.vrt does NOT exist!")
+"""
+test.add_test_cell('image_file = path/f"stack{name}_{polarization}.vrt"', test_vrt)
+
+## Confirm existence of RCSTimeseries plot
+test_rtc_png = """
+if Path(f"{path}/RCSTimeSeries-25.254° 88.380°.png").exists():
+    test.log_test('p', f"{path}/{figname} exists!")
+else:
+    test.log_test('f', f"{path}/{figname} does NOT exist!")
+"""
+test.add_test_cell("plt.savefig(path/figname, dpi=300, transparent='true')", test_rtc_png)
 
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########

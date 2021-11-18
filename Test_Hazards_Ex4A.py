@@ -2,6 +2,8 @@
 
 from getpass import getpass
 import shutil
+import glob
+import os
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -15,12 +17,12 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = f\"{os.getcwd()}/{name}\""
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/{name}"
-_replacement = f"path = f\"{test_data_path}\""
+_to_replace = "path = Path(f'/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}')"
+_replacement = "path = Path(f'/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex4A')"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex4A"
 try:
    shutil.rmtree(test_data_path)
 except:
@@ -28,7 +30,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
@@ -38,7 +40,7 @@ for search_str in skip_em:
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if os.path.exists(f"{os.getcwd()}/{time_series}"):
+if Path(f"{time_series}").exists():
     test.log_test('p', f"{time_series} successfully copied from {time_series_path}")
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
@@ -47,31 +49,30 @@ test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series
 
 # Confirm that all expected tiffs were extracted from the tarball
 test_tarball_extraction = """
-import glob
-test_tiff_qty = len(glob.glob("tiffsfuego/*.tif"))
+test_tiff_qty = len(glob.glob(f"{path}/tiffsfuego/*.tif"))
 if test_tiff_qty == 60:
     test.log_test('p', f"60 tiffs extracted, as expected")
 else:
     test.log_test('f', f"{test_tiff_qty} tiffs extracted, NOT 60")
-if os.path.exists(f"{os.getcwd()}/stackfuego_VV.vrt"):
-    test.log_test('p', f"{os.getcwd()}/stackfuego_VV.vrt found")
+if Path(f"{path}/stackfuego_VV.vrt").exists():
+    test.log_test('p', f"{path}/stackfuego_VV.vrt found")
 else:
-    test.log_test('f', f"{os.getcwd()}/stackfuego_VV.vrt NOT found")
-if os.path.exists(f"{os.getcwd()}/datesfuego_VV.csv"):
-    test.log_test('p', f"{os.getcwd()}/datesfuego_VV.csv found")
+    test.log_test('f', f"{path}/stackfuego_VV.vrt NOT found")
+if Path(f"{path}/datesfuego_VV.csv").exists():
+    test.log_test('p', f"{path}/datesfuego_VV.csv found")
 else:
-    test.log_test('f', f"{os.getcwd()}/datesfuego_VV.csv NOT found")
+    test.log_test('f', f"{path()}/datesfuego_VV.csv NOT found")
 
-if os.path.exists(f"{os.getcwd()}/stackfuego_VH.vrt"):
-    test.log_test('p', f"{os.getcwd()}/stackfuego_VH.vrt found")
+if Path(f"{path}/stackfuego_VH.vrt").exists():
+    test.log_test('p', f"{path}/stackfuego_VH.vrt found")
 else:
-    test.log_test('f', f"{os.getcwd()}/stackfuego_VH.vrt NOT found")
-if os.path.exists(f"{os.getcwd()}/datesfuego_VH.csv"):
-    test.log_test('p', f"{os.getcwd()}/datesfuego_VH.csv found")
+    test.log_test('f', f"{path}/stackfuego_VH.vrt NOT found")
+if Path(f"{path}/datesfuego_VH.csv").exists():
+    test.log_test('p', f"{path}/datesfuego_VH.csv found")
 else:
-    test.log_test('f', f"{os.getcwd()}/datesfuego_VH.csv NOT found")
+    test.log_test('f', f"{path}/datesfuego_VH.csv NOT found")
 """
-test.add_test_cell("!tar -xvzf {name}.tar.gz", test_tarball_extraction)
+test.add_test_cell("!tar -xvzf {time_series} -C {path}", test_tarball_extraction)
 
 # Confirm creation of dtype and size of tindex
 test_tindex = """
@@ -101,21 +102,21 @@ test.add_test_cell("rasterstack = img.ReadAsArray()", test_rasterstack)
 
 # Confirm creation of plots_and_animations directory
 test_product_path = """
-if os.path.exists(product_path):
+if Path(f"{product_path}").exists():
     test.log_test('p', f"{product_path} found")
 else:
     test.log_test('f', f"{product_path} NOT found")
 """
-test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+test.add_test_cell("product_path = path/'plots_and_animations'", test_product_path)
 
 # Confirm creation of time series animation
 test_ts_animation = """
-if os.path.exists(os.path.join(product_path, f'animation_{labeldB}.gif')):
-    test.log_test('p', f"{os.path.join(product_path, f'animation_{labeldB}.gif')} found")
+if Path(f"{product_path}/animation_{labeldB}.gif").exists():
+    test.log_test('p', f"{product_path}/animation_{labeldB}.gif found")
 else:
-    test.log_test('f', f"{os.path.join(product_path, f'animation_{labeldB}.gif')} NOT found")
+    test.log_test('f', f"{product_path}/animation_{labeldB}.gif NOT found")
 """
-test.add_test_cell("ani.save(os.path.join(product_path", test_ts_animation)
+test.add_test_cell("ani.save(product_path/f'animation_{labeldB}.gif', writer='pillow', fps=2)", test_ts_animation)
 
 # Confirm metric_keys
 
@@ -184,7 +185,7 @@ if os.path.exists(os.path.join(product_path, f'{logratiolabel}.png')):
 else:
     test.log_test('f', f"{os.path.join(product_path, f'{logratiolabel}.png')} NOT found")
 """
-test.add_test_cell("plt.savefig(os.path.join(product_path, f'{logratiolabel}.png')", test_logratio_png)
+test.add_test_cell("plt.savefig(product_path/f'{logratiolabel}.png',", test_logratio_png)
 
 # Confirm geotrans == [724170.0, 30.0, 0.0, 1602960.0, 0.0, -30.0]
 test_geotrans = """
@@ -197,12 +198,12 @@ test.add_test_cell("geotrans = list(img.GetGeoTransform())", test_geotrans)
 
 # Confirm creation of fuego_tsmetrics directory
 test_tsmetrics_dir = """
-if os.path.exists("fuego_tsmetrics"):
+if Path(f"{path}/fuego_tsmetrics"):
     test.log_test('p', "fuego_tsmetrics directory found")
 else:
     test.log_test('f', "fuego_tsmetrics directory NOT found")
 """
-test.add_test_cell("dirname = f'{name}_tsmetrics'", test_tsmetrics_dir)
+test.add_test_cell("dirname = path/f'{name}_tsmetrics'", test_tsmetrics_dir)
 
 
 # Confirm creation of metric geotiffs
@@ -214,11 +215,11 @@ for metric in metrics:
     else:
         test.log_test('f', f"{name_} NOT found")
 """
-test.add_test_cell("name_ = os.path.join(dirname, f'{metric}_{labeldB}.tif')", test_metric_geotiffs)
+test.add_test_cell("fnmetric = str(dirname/f'{name}_{labeldB}_{metric}_thresholds.tif')", test_metric_geotiffs)
 
 # Confirm creation of ts_metrics_dB.vrt
 test_ts_metrics_dB_vrt = """
-if os.path.exists(f"{dirname}_{labeldB}.vrt"):
+if Path(f"{dirname}_{labeldB}.vrt").exists():
     test.log_test('p', f"{dirname}_{labeldB}.vrt found")
 else:
     test.log_test('f', f"{dirname}_{labeldB}.vrt NOT found")
@@ -229,12 +230,12 @@ test.add_test_cell("cmd='gdalbuildvrt -separate -overwrite -vrtnodata", test_ts_
 test_threshold_tifs = """
 for metric in masks:
     fnmetric = os.path.join(dirname, f'{name}_{labeldB}_{metric}_thresholds.tif')
-    if os.path.exists(fnmetric):
+    if Path(fnmetric).exists():
         test.log_test('p', f"{fnmetric} found")
     else:
         test.log_test('f', f"{fnmetric} NOT found")
 """
-test.add_test_cell("fnmetric = os.path.join(dirname, f'{name}_", test_threshold_tifs)
+test.add_test_cell("fnmetric = str(dirname/f'{name}_{labeldB}_{metric}_thresholds.tif')", test_threshold_tifs)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 

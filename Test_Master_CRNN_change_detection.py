@@ -15,15 +15,28 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = 'base_path = "/home/jovyan/notebooks/SAR_Training/English/Master/data_CRNN_change_detection"'
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_data_CRNN_change_detection"
-_replacement = f"base_path = (f\"{test_data_path}\")"
+_to_replace = 'base_path = Path("/home/jovyan/notebooks/SAR_Training/English/Master/data_CRNN_change_detection")'
+test_data_path = 'base_path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_data_CRNN_change_detection")'
+test.replace_line(_to_replace, _to_replace, test_data_path)
+
+# Change 1st data path
+_to_replace = "data = sio.loadmat('DL-data/Taizhou_3x3/TaizhouTm2000_norm.mat')"
+_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTm2000_norm.mat")'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
-# Get into the data sirectory
-_to_replace = "asfn.new_directory(base_path)"
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_data_CRNN_change_detection"
-_replacement = f"os.chdir(f\"{test_data_path}\")"
+# Change 2nd data path
+_to_replace = "data = sio.loadmat('DL-data/Taizhou_3x3/TaizhouTm2003_norm.mat')"
+_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTm2003_norm.mat")'
+test.replace_line(_to_replace, _to_replace, _replacement)
+
+# Change 3rd data path
+_to_replace = "data = sio.loadmat('DL-data/Taizhou_3x3/TaizhouTraMapBinary.mat')"
+_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTraMapBinary.mat")'
+test.replace_line(_to_replace, _to_replace, _replacement)
+
+# Change 4th data path
+_to_replace = "data = sio.loadmat('DL-data/Taizhou_3x3/TaizhouTestMapBinary.mat')"
+_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTestMapBinary.mat")'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Skip all cells inputing user defined values for filtering products to download
@@ -98,7 +111,7 @@ test.add_test_cell("print('the shape of target tensor on training set is: {}'.fo
 
 # Verify loss.png is created
 test_loss_png = '''
-if os.path.exists(f"{test_data_path}/loss.png"):
+if Path(f"{base_path}/loss.png").exists():
     test.log_test('p', f"{test_data_path}/loss.png found")
 else:
     test.log_test('f', f"{test_data_path}/loss.png NOT found")
@@ -109,7 +122,7 @@ test.add_test_cell("plt.plot(loss)",test_loss_png)
 test_loss_png_size = '''
 expected_loss_png_size_1 = (1469,1244)
 expected_loss_png_size_2 = (1438,1244)
-loss_im_size = Image.open(f"{test_data_path}/loss.png")
+loss_im_size = Image.open(f"{base_path}/loss.png")
 loss_png_size = loss_im_size.size
 if loss_png_size == expected_loss_png_size_1 or loss_png_size == expected_loss_png_size_2:
     test.log_test('p', f"loss_png_size == (1469,1244) or (1438,1244)")
@@ -120,7 +133,7 @@ test.add_test_cell("plt.plot(loss)",test_loss_png_size)
 
 # Verify change_map_probability.png is created
 test_change_map_probability_png = '''
-if os.path.exists(f"{test_data_path}/change_map_probability.png"):
+if Path(f"{base_path}/change_map_probability.png").exists():
     test.log_test('p', f"{test_data_path}/change_map_ability.png found")
 else:
     test.log_test('f', f"{test_data_path}/change_map_probability.png NOT found")
@@ -130,7 +143,7 @@ test.add_test_cell("plt.imshow(change_map_prob)",test_change_map_probability_png
 # Verify change_map_probability.png size
 test_change_map_probability_png_size = '''
 expected_change_map_probability_png_size = (1600,1400)
-change_map_probability_im_size = Image.open(f"{test_data_path}/change_map_probability.png")
+change_map_probability_im_size = Image.open(f"{base_path}/change_map_probability.png")
 change_map_probability_png_size = change_map_probability_im_size.size
 if change_map_probability_png_size == expected_change_map_probability_png_size:
     test.log_test('p', f"change_map_probability_png_size == (1600,1400)")
@@ -141,7 +154,7 @@ test.add_test_cell("plt.imshow(change_map_prob)",test_change_map_probability_png
 
 # Verify change_map_binary.png is created
 test_change_map_binary_png = '''
-if os.path.exists(f"{test_data_path}/change_map_binary.png"):
+if Path(f"{base_path}/change_map_binary.png").exists():
     test.log_test('p', f"{test_data_path}/change_map_binary.png found")
 else:
     test.log_test('f', f"{test_data_path}/change_map_binary.png NOT found")
@@ -151,7 +164,7 @@ test.add_test_cell("plt.imshow(change_map_binary)",test_change_map_binary_png)
 # Verify change_map_binary.png size
 test_change_map_binary_png_size = '''
 expected_change_map_binary_png_size = (1600,1400)
-change_map_binary_im_size = Image.open(f"{test_data_path}/change_map_binary.png")
+change_map_binary_im_size = Image.open(f"{base_path}/change_map_binary.png")
 change_map_binary_png_size = change_map_binary_im_size.size
 if change_map_binary_png_size == expected_change_map_binary_png_size:
     test.log_test('p', f"change_map_binary_png_size == (1600,1400)")

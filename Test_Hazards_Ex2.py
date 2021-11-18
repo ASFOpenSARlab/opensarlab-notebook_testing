@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import shutil
+import glob
 from getpass import getpass
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -15,12 +16,22 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = ("path = \"/home/jovyan/notebooks/SAR_Training/English/Hazards/S1-MadreDeDios\"")
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/S1-MadreDeDios"
-_replacement = f"path = \"{test_data_path}\""
-test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
+_to_replace = 'path = Path("/home/jovyan/notebooks/SAR_Training/English/Hazards/data_Ex2-4_S1-MadreDeDios")'
+_replacement = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex2_S1-MadreDeDios")'
+test.replace_line(_to_replace, _to_replace, _replacement)
+
+# Fix bad date format that only happens when running the test script
+_to_replace = "!ls {path}/tiffs/*_VV.tiff | sort | sed 's/[^0-9]*//g' | cut -c 4-11 > {path}/raster_stack_VV.dates"
+_replacement = "!ls {path}/tiffs/*_VV.tiff | sort | sed 's/[^0-9]*//g' | cut -c 3-10 > {path}/raster_stack_VV.dates"
+test.replace_line(_to_replace, _to_replace, _replacement)
+
+# Fix bad date format that only happens when running the test script
+_to_replace = "!ls {path}/tiffs/*_VH.tiff | sort | sed 's/[^0-9]*//g' | cut -c 4-11 > {path}/raster_stack_VH.dates"
+_replacement = "!ls {path}/tiffs/*_VH.tiff | sort | sed 's/[^0-9]*//g' | cut -c 3-10 > {path}/raster_stack_VH.dates"
+test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex2_S1-MadreDeDios"
 try:
    shutil.rmtree(test_data_path)
 except:
@@ -38,37 +49,36 @@ for search_str in skip_em:
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if os.path.exists(f"{os.getcwd()}/{time_series}"):
+if Path(f"{time_series}").exists():
     test.log_test('p', f"{time_series} successfully copied from {time_series_path}")
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path", test_s3_copy)
+test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Check that 156 tiffs were extracted from the tarball
 test_extract = """
-import glob
-test_tiff_path = f"{os.getcwd()}/tiffs/*.tiff"
-test_len = len(glob.glob(test_tiff_path))
+test_tiff_path = (f"{path}/tiffs/*.tiff")
+test_len = len(glob.glob(str(test_tiff_path)))
 if test_len == 156:
     test.log_test('p', f"{test_len} tifs extracted from {time_series}")
 else:
     test.log_test('f', f"Expected 156 tifs extracted from tarball, found {test_len}")
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_extract)
+test.add_test_cell("asfn.asf_unzip(str(path), time_series)", test_extract)
 
 # Check that raster_stack.vrt was created
 test_vv_vrt = """    
-if os.path.exists(\"raster_stack.vrt\"):
+if Path(f"{path}/raster_stack.vrt").exists():
     test.log_test('p', f"Extracted raster_stack.vrt")
 else:
     test.log_test('f', f"raster_stack.vrt not found")    
 """
-test.add_test_cell("!gdalbuildvrt -separate raster_stack.vrt", test_vv_vrt)
+test.add_test_cell("!gdalbuildvrt -separate {path}/raster_stack.vrt {path}/tiffs/*_VV.tiff", test_vv_vrt)
 
 # Check that raster_stack_VV.dates was created
 test_vv_dates = """
-if os.path.exists(\"raster_stack_VV.dates\"):
+if Path(f"{path}/raster_stack_VV.dates").exists():
     test.log_test('p', f"Extracted raster_stack_VV.dates")
 else:
     test.log_test('f', f"raster_stack_VV.dates not found")
@@ -82,7 +92,7 @@ if type(img) == gdal.Dataset:
 else:
     test.log_test('f', f"type(img) == {type(img)}, not gdal.Dataset")
 """
-test.add_test_cell("img = gdal.Open(image_file_VV)", test_open_vrt)
+test.add_test_cell("img = gdal.Open(str(image_file_VV))", test_open_vrt)
 
 # Confirm that raster0 is a numpy.ndarray with shape (1102, 1090)
 test_raster0 = """
@@ -112,12 +122,12 @@ test.add_test_cell("raster0 = band.ReadAsArray()", test_rasterstack_VV)
 
 # Confirm that a time series animation was created and stored at product_path
 test_animation_created = """
-if os.path.exists(f"{path}/{product_path}/animation.gif"):
-    test.log_test('p', f"{path}/{product_path}/animation.gif found")
+if Path(f"{product_path}/animation.gif").exists():
+    test.log_test('p', f"{product_path}/animation.gif found")
 else:
-    test.log_test('f', f"{path}/{product_path}/animation.gif NOT found")
+    test.log_test('f', f"{product_path}/animation.gif NOT found")
 """
-test.add_test_cell("ani.save('animation.gif', writer='pillow', fps=2)", test_animation_created)
+test.add_test_cell("ani.save(product_path/'animation.gif', writer='pillow', fps=2)", test_animation_created)
 
 # Confirm the creation of a numpy.ma.core.MaskedArray with shape (78, 1102, 1090)
 test_rasterPwr = """
@@ -199,30 +209,30 @@ test.add_test_cell("utm_zone = vrt_info['coordinateSystem']['wkt'].s", test_utm_
 
 # Confirm that rgb_stretched was converted to a geotiff, projected to the correct utm, and stored in product_path
 test_MadreDeDios_multitemp_RGB_geotiff = """
-if os.path.exists(f"{path}/{product_path}/MadreDeDios-multitemp-RGB.tiff"):
-    test.log_test('p', f"{path}/{product_path}/MadreDeDios-multitemp-RGB.tiff found")    
+if Path(f"{product_path}/MadreDeDios-multitemp-RGB.tiff").exists():
+    test.log_test('p', f"{product_path}/MadreDeDios-multitemp-RGB.tiff found")    
 else:
-    test.log_test('f', f"{path}/{product_path}/MadreDeDios-multitemp-RGB.tiff NOT found")
-test_rgb_geotiff_info = gdal.Info(f"{path}/{product_path}/MadreDeDios-multitemp-RGB.tiff", format='json')
+    test.log_test('f', f"{product_path}/MadreDeDios-multitemp-RGB.tiff NOT found")
+test_rgb_geotiff_info = gdal.Info(f"{product_path}/MadreDeDios-multitemp-RGB.tiff", format='json')
 if test_rgb_geotiff_info['driverLongName'] == 'GeoTIFF':
-    test.log_test('p', f"{path}/{product_path}/MadreDeDios-multitemp-RGB.tiff is a GeoTIFF")    
+    test.log_test('p', f"{product_path}/MadreDeDios-multitemp-RGB.tiff is a GeoTIFF")    
 else:
-    test.log_test('f', f"{path}/{product_path}/MadreDeDios-multitemp-RGB.tiff is NOT a GeoTIFF")
+    test.log_test('f', f"{product_path}/MadreDeDios-multitemp-RGB.tiff is NOT a GeoTIFF")
 test_utm = test_rgb_geotiff_info['coordinateSystem']['wkt'].split('ID[\"EPSG\",')[8][:-2]
 if test_utm == utm_zone:
     test.log_test('p', f"MadreDeDios-multitemp-RGB.tiff utm == {utm_zone}")    
 else:
     test.log_test('f', f"MadreDeDios-multitemp-RGB.tiff utm == {test_utm}, NOT {utm_zone}")
 """
-test.add_test_cell("geotiff_from_plot(rgb_stretched, 'MadreDeDios-multitemp-RGB'", test_MadreDeDios_multitemp_RGB_geotiff)
+test.add_test_cell("geotiff_from_plot(rgb_stretched, product_path/'MadreDeDios-multitemp-RGB', coords, utm_zone)", test_MadreDeDios_multitemp_RGB_geotiff)
 
 # Confirm that raster_stack_VH.vrt was created, is projected to the correct utm, and saved to the analysis directory
 test_raster_stack_VH = """
-if os.path.exists(f"{path}/raster_stack_VH.vrt"):
+if Path(f"{path}/raster_stack_VH.vrt").exists():
     test.log_test('p', f"{path}/raster_stack_VH.vrt found")    
 else:
     test.log_test('f', f"{path}/raster_stack_VH.vrt NOT found")
-test_raster_stack_VH_info = gdal.Info(image_file_VH, format='json')
+test_raster_stack_VH_info = gdal.Info(str(image_file_VH), format='json')
 if test_raster_stack_VH_info['driverLongName'] == 'Virtual Raster':
     test.log_test('p', f"{path}/raster_stack_VH.vrt is a VRT")    
 else:
@@ -233,7 +243,7 @@ if test_utm == utm_zone:
 else:
     test.log_test('f', f"test_raster_stack_VH_info utm == {test_utm}, NOT {utm_zone}")
 """
-test.add_test_cell("!gdalbuildvrt -separate raster_stack_VH.vrt tiffs/*_VH.tiff", test_raster_stack_VH)
+test.add_test_cell("!gdalbuildvrt -separate {path}/raster_stack_VH.vrt {path}/tiffs/*_VH.tiff", test_raster_stack_VH)
 
 # Confirm that tindex_VH pandas DateTimeIndex created and has length 78
 test_tindex_VH = """
@@ -276,15 +286,15 @@ test.add_test_cell("rgb_stretched_POL[:,:,i] = exposure.", test_rgb_stretched_PO
 
 # Confirm that rgb_stretched_POL was converted to a geotiff, projected to the correct utm, and stored in product_path
 test_MadreDeDios_multipol_RGB_geotiff = """
-if os.path.exists(f"{path}/{product_path}/MadreDeDios-multipol-RGB.tiff"):
-    test.log_test('p', f"{path}/{product_path}/MadreDeDios-multipol-RGB.tiff found")    
+if Path(f"{product_path}/MadreDeDios-multipol-RGB.tiff").exists():
+    test.log_test('p', f"{product_path}/MadreDeDios-multipol-RGB.tiff found")    
 else:
-    test.log_test('f', f"{path}/{product_path}/MadreDeDios-multipol-RGB.tiff NOT found")
-test_rgb_geotiff_info = gdal.Info(f"{path}/{product_path}/MadreDeDios-multipol-RGB.tiff", format='json')
+    test.log_test('f', f"{product_path}/MadreDeDios-multipol-RGB.tiff NOT found")
+test_rgb_geotiff_info = gdal.Info(f"{product_path}/MadreDeDios-multipol-RGB.tiff", format='json')
 if test_rgb_geotiff_info['driverLongName'] == 'GeoTIFF':
-    test.log_test('p', f"{path}/{product_path}/MadreDeDios-multipol-RGB.tiff is a GeoTIFF")    
+    test.log_test('p', f"{product_path}/MadreDeDios-multipol-RGB.tiff is a GeoTIFF")    
 else:
-    test.log_test('f', f"{path}/{product_path}/MadreDeDios-multipol-RGB.tiff is NOT a GeoTIFF")
+    test.log_test('f', f"{product_path}/MadreDeDios-multipol-RGB.tiff is NOT a GeoTIFF")
 test_utm = test_rgb_geotiff_info['coordinateSystem']['wkt'].split('ID[\"EPSG\",')[8][:-2]
 if test_utm == utm_zone:
     test.log_test('p', f"MadreDeDios-multipol-RGB.tiff utm == {utm_zone}")    
@@ -331,15 +341,15 @@ test.add_test_cell("metric_keys = list(metrics.keys())", test_metrics)
 # Confirm Geotiff creation from each metric
 test_metric_geotiffs = """
 for key in metrics:
-    if os.path.exists(f"{path}/{product_path}/MadreDeDios-{key}.tiff"):
+    if Path(f"{product_path}/MadreDeDios-{key}.tiff").exists():
         test.log_test('p', f"{path}/{product_path}/MadreDeDios-{key}.tiff found") 
     else:
-        test.log_test('f', f"{path}/{product_path}/MadreDeDios-{key}.tiff NOT found")
-    test_metric_geotiff_info = gdal.Info(f"{path}/{product_path}/MadreDeDios-{key}.tiff", format='json')
+        test.log_test('f', f"{product_path}/MadreDeDios-{key}.tiff NOT found")
+    test_metric_geotiff_info = gdal.Info(f"{product_path}/MadreDeDios-{key}.tiff", format='json')
     if test_metric_geotiff_info['driverLongName'] == 'GeoTIFF':
-        test.log_test('p', f"{path}/{product_path}/MadreDeDios-{key}.tiff is a GeoTIFF")    
+        test.log_test('p', f"{product_path}/MadreDeDios-{key}.tiff is a GeoTIFF")    
     else:
-        test.log_test('f', f"{path}/{product_path}/MadreDeDios-{key}.tiff is NOT a GeoTIFF")
+        test.log_test('f', f"{product_path}/MadreDeDios-{key}.tiff is NOT a GeoTIFF")
     test_utm = test_metric_geotiff_info['coordinateSystem']['wkt'].split('ID[\"EPSG\",')[8][:-2]
     if test_utm == utm_zone:
         test.log_test('p', f"MadreDeDios-{key}.tiff utm == {utm_zone}")    

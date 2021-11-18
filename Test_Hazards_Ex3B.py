@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from pip._internal import main as pipmain
+pipmain(['install', 'astor'])
 
 from getpass import getpass
 import shutil
@@ -15,13 +17,12 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = ("path = \"/home/jovyan/notebooks/SAR_Training/English/"
-               "Hazards/data_Ex2-4_S1-MadreDeDios\"")
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_Ex2-4_S1-MadreDeDios"
-_replacement = f"path = \"{test_data_path}\""
-test.replace_line("path = \"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
+_to_replace = 'path = Path("/home/jovyan/notebooks/SAR_Training/English/Hazards/data_Ex2-4_S1-MadreDeDios")'
+_replacement = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_data_Ex2-4_S1-MadreDeDios")'
+test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_data_Ex2-4_S1-MadreDeDios"
 try:
    shutil.rmtree(test_data_path)
 except:
@@ -29,7 +30,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
@@ -44,7 +45,7 @@ test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if os.path.exists(f"{os.getcwd()}/{time_series}"):
+if Path(f"{time_series}").exists():
     test.log_test('p', f"{time_series} successfully copied from {time_series_path}")
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
@@ -54,17 +55,17 @@ test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series
 # Confirm that all expected tiffs were extracted from the zip
 test_zip_extraction = """
 import glob
-test_tiff_qty = len(glob.glob("tiffs/*.*"))
+test_tiff_qty = len(glob.glob(f"{path}/tiffs/*.*"))
 if test_tiff_qty == 156:
     test.log_test('p', f"156 tiffs extracted, as expected")
 else:
     test.log_test('f', f"{test_tiff_qty} tiffs extracted, NOT 156")
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series)", test_zip_extraction)
+test.add_test_cell("asfn.asf_unzip(str(path), time_series)", test_zip_extraction)
 
 # Confirm the creation of VV and VH vrts and that they contain 79 files each
 test_vrts = """
-test_vv_vrt_info = gdal.Info(image_file_VV, format='json')
+test_vv_vrt_info = gdal.Info(str(image_file_VV), format='json')
 if test_vv_vrt_info['driverLongName'] == 'Virtual Raster':
     test.log_test('p', f"image_file_VV's driverLongName == 'Virtual Raster'")
 else:
@@ -75,7 +76,7 @@ if len(test_vv_vrt_info['files']) == 79:
 else:
     test.log_test('f', f"image_file_VV contains {len(test_vv_vrt_info['files'])} files, NOT 79")
              
-test_vh_vrt_info = gdal.Info(image_file_VH, format='json')            
+test_vh_vrt_info = gdal.Info(str(image_file_VH), format='json')            
 if test_vh_vrt_info['driverLongName'] == 'Virtual Raster':
     test.log_test('p', f"image_file_VH's driverLongName == 'Virtual Raster'")
 else:
@@ -86,7 +87,7 @@ if len(test_vh_vrt_info['files']) == 79:
 else:
     test.log_test('f', f"image_file_VH contains {len(test_vh_vrt_info['files'])} files, NOT 79")
 """
-test.add_test_cell("image_file_VV = \"raster_stack.vrt\"", test_vrts)
+test.add_test_cell('image_file_VV = path/"raster_stack.vrt"', test_vrts)
 
 # Check creation and size of VV and VH pandas.DatetimeIndex
 test_vv_vh_datetimeindexes = """
@@ -194,12 +195,12 @@ test.add_test_cell("s_ts.append(pd.Series(means", test_s_ts)
 
 # Confirm creation of time series backscatter histogram png
 test_histogram = """
-if os.path.exists(f"{path}/{figname}"):
+if Path(f"{path}/{figname}").exists:
     test.log_test('p', f"{path}/{figname} found")
 else:
     test.log_test('f', f"{path}/{figname} NOT found")
 """
-test.add_test_cell("plt.savefig(figname,", test_histogram)
+test.add_test_cell("plt.savefig(path/figname, dpi=300, transparent='true')", test_histogram)
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
 
