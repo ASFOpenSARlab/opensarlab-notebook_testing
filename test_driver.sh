@@ -22,21 +22,21 @@ conda run -n rtc_analysis kernda --display-name rtc_analysis -o /home/jovyan/.lo
 conda activate /home/jovyan/.local/envs/rtc_analysis
 pip install astor
 ## Run tests on notebooks that use rtc_analysis environment
-python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex1.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4B.py
-#python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3A.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
-#python /home/jovyan/opensarlab-notebook_testing/Test_ASF_Projects_Subset_Data_Stack.py
-python /home/jovyan/opensarlab-notebook_testing/Test_Master_Subset_Data_Stack.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex1.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4B.py
+#python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3A.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3B.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4A.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex4B.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_Change_Detection_Amplitude_Time_Series_Example.py
+#python3 /home/jovyan/opensarlab-notebook_testing/Test_ASF_Projects_Subset_Data_Stack.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_Subset_Data_Stack.py
 ## Deactivate rtc_analysis environment
 conda deactivate
 ##Re-install and activate insar_analysis conda environment
@@ -47,8 +47,8 @@ source /home/jovyan/conda_environments/install_insar_analysis_pkgs.sh
 conda activate /home/jovyan/.local/envs/insar_analysis
 pip install astor
 ## Run tests on notebooks that use insar_analysis environment
-python /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
-#python /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
+#python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
 ## Deactivate insar_analysis environment
 conda deactivate
 ##Re-install and activate the machine learning conda environment
@@ -58,7 +58,7 @@ conda init
 conda activate /home/jovyan/.local/envs/machine_learning
 pip install astor
 ## Run tests on notebooks that use the machine_learning environment
-python /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detection.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detection.py
 ## Deactivate machine_learning environment
 conda deactivate
 # ##Re-install and activate the train conda environment
