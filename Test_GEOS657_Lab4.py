@@ -15,18 +15,18 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = \"/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/lab_4_data\""
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_lab_4"
-_replacement = f"path = f\"{test_data_path}\""
+_to_replace = 'path = f"{os.getcwd()}/lab_4_data"'
+_replacement = 'path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS657_data_lab_4"'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
-# Change data directory for product files
-_to_replace = "datadirectory = \'/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/lab_4_data/time_series/S32644X696260Y3052060sS1-EBD\'"
-test_data_directory = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_lab_4/time_series/S32644X696260Y3052060sS1-EBD"
-_replacement = f"datadirectory = f\"{test_data_directory}\""
-test.replace_line(_to_replace, _to_replace, _replacement)
+# # Change data directory for product files
+# _to_replace = "datadirectory = f'{path}/time_series/S32644X696260Y3052060sS1-EBD'"
+# _replacement = 'datadirec"/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_lab_4/time_series/S32644X696260Y3052060sS1-EBD"
+# _replacement = f"datadirectory = f\"{test_data_directory}\""
+# test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS657_data_lab_4"
 try:
    shutil.rmtree(test_data_path)
 except:
@@ -34,7 +34,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
