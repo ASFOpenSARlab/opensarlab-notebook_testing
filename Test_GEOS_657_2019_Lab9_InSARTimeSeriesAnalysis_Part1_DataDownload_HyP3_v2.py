@@ -32,13 +32,16 @@ test.replace_cell("while True:", _replacement)
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["import url_widget as url_w",
            "if env[0] != '/home/jovyan/.local/envs/train':",
            "hyp3 = HyP3(prompt=True)",
-           "projects = asfn.get_RTC_projects(hyp3)",
-           "date_picker = asfn.gui_date_picker(dates)",
-           "project = asfn.filter_jobs_by_date(jobs, date_range)",
-           "project = asfn.get_paths_orbits(project)",
+           "active_projects = dict()",
+           "dates = asfn.get_job_dates(batch)",
+           "path_choice = asfn.select_mult_parameters(paths)",
+           "flight_path = path_choice.value",
+           "batch = asfn.filter_jobs_by_date(batch, date_range)",
+           "asfn.set_paths_orbits(batch)",
+           "batch = asfn.filter_jobs_by_path(batch, flight_path)",
            "aoi = asfn.AOI_Selector(rasterstack, fig_xsize, fig_ysize)",
            "!$train_path/aps_weather_model.py -h",
            "def write_dot_netrc(path, username, password):"
@@ -65,10 +68,10 @@ zip_paths.sort()
 back_dir = f"{analysis_directory}"
 os.chdir(back_dir)
 '''
-test.replace_cell("project = asfn.filter_jobs_by_orbit(project, direction)", test_unzip)
+test.replace_cell("direction = direction_choice.value", test_unzip)
 
 # Unzip the individual HyP3 products
-_to_replace = "project_zips = jobs.download_files(ingram_folder)"
+_to_replace = "project_zips = batch.download_files(ingram_folder)"
 _replacement = "project_zips = zip_paths"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
@@ -149,21 +152,21 @@ if str(zip_paths) == test_zip_pths:
 else:
     test.log_test('f', f"zip_paths == {zip_paths}, NOT {test_zip_pths}")
 '''
-test.add_test_cell("project = asfn.filter_jobs_by_orbit(project, direction)", test_zip_paths)
+test.add_test_cell("for z in project_zips:", test_zip_paths)
 
 # Confirm initial paths to amplitude files
 test_amp_paths =''' 
-test_amp_pths ="['ingrams/S1BB_20200613T141253_20210103T141256_VVP204_INT80_G_ueF_DE52/S1BB_20200613T141253_20210103T141256_VVP204_INT80_G_ueF_DE52_amp.tif', 'ingrams/S1BB_20201222T141257_20210103T141256_VVP012_INT80_G_ueF_A80C/S1BB_20201222T141257_20210103T141256_VVP012_INT80_G_ueF_A80C_amp.tif', 'ingrams/S1BB_20200707T141254_20210103T141256_VVP180_INT80_G_ueF_E339/S1BB_20200707T141254_20210103T141256_VVP180_INT80_G_ueF_E339_amp.tif', 'ingrams/S1BB_20190526T141245_20210103T141256_VVP588_INT80_G_ueF_25B7/S1BB_20190526T141245_20210103T141256_VVP588_INT80_G_ueF_25B7_amp.tif', 'ingrams/S1BB_20191216T141251_20210103T141256_VVP384_INT80_G_ueF_04BE/S1BB_20191216T141251_20210103T141256_VVP384_INT80_G_ueF_04BE_amp.tif', 'ingrams/S1BB_20201128T141258_20210103T141256_VVP036_INT80_G_ueF_D855/S1BB_20201128T141258_20210103T141256_VVP036_INT80_G_ueF_D855_amp.tif', 'ingrams/S1BB_20200321T141249_20210103T141256_VVP288_INT80_G_ueF_F2E0/S1BB_20200321T141249_20210103T141256_VVP288_INT80_G_ueF_F2E0_amp.tif', 'ingrams/S1BB_20200812T141256_20210103T141256_VVP144_INT80_G_ueF_6FC6/S1BB_20200812T141256_20210103T141256_VVP144_INT80_G_ueF_6FC6_amp.tif', 'ingrams/S1BB_20201104T141258_20210103T141256_VVP060_INT80_G_ueF_EA59/S1BB_20201104T141258_20210103T141256_VVP060_INT80_G_ueF_EA59_amp.tif', 'ingrams/S1BB_20200202T141249_20210103T141256_VVP336_INT80_G_ueF_2668/S1BB_20200202T141249_20210103T141256_VVP336_INT80_G_ueF_2668_amp.tif', 'ingrams/S1BB_20190408T141243_20210103T141256_VVP636_INT80_G_ueF_0DD4/S1BB_20190408T141243_20210103T141256_VVP636_INT80_G_ueF_0DD4_amp.tif', 'ingrams/S1BB_20200508T141251_20210103T141256_VVP240_INT80_G_ueF_2F16/S1BB_20200508T141251_20210103T141256_VVP240_INT80_G_ueF_2F16_amp.tif', 'ingrams/S1BB_20190725T141249_20210103T141256_VVP528_INT80_G_ueF_9805/S1BB_20190725T141249_20210103T141256_VVP528_INT80_G_ueF_9805_amp.tif', 'ingrams/S1BB_20191122T141252_20210103T141256_VVP408_INT80_G_ueF_50ED/S1BB_20191122T141252_20210103T141256_VVP408_INT80_G_ueF_50ED_amp.tif', 'ingrams/S1BB_20201011T141258_20210103T141256_VVP084_INT80_G_ueF_1BC5/S1BB_20201011T141258_20210103T141256_VVP084_INT80_G_ueF_1BC5_amp.tif']"
+test_amp_pths ="['ingrams/S1BB_20191122T141252_20210103T141256_VVP408_INT80_G_ueF_50ED/S1BB_20191122T141252_20210103T141256_VVP408_INT80_G_ueF_50ED_amp.tif', 'ingrams/S1BB_20190408T141243_20210103T141256_VVP636_INT80_G_ueF_0DD4/S1BB_20190408T141243_20210103T141256_VVP636_INT80_G_ueF_0DD4_amp.tif', 'ingrams/S1BB_20200613T141253_20210103T141256_VVP204_INT80_G_ueF_DE52/S1BB_20200613T141253_20210103T141256_VVP204_INT80_G_ueF_DE52_amp.tif', 'ingrams/S1BB_20200321T141249_20210103T141256_VVP288_INT80_G_ueF_F2E0/S1BB_20200321T141249_20210103T141256_VVP288_INT80_G_ueF_F2E0_amp.tif', 'ingrams/S1BB_20200812T141256_20210103T141256_VVP144_INT80_G_ueF_6FC6/S1BB_20200812T141256_20210103T141256_VVP144_INT80_G_ueF_6FC6_amp.tif', 'ingrams/S1BB_20200202T141249_20210103T141256_VVP336_INT80_G_ueF_2668/S1BB_20200202T141249_20210103T141256_VVP336_INT80_G_ueF_2668_amp.tif', 'ingrams/S1BB_20200508T141251_20210103T141256_VVP240_INT80_G_ueF_2F16/S1BB_20200508T141251_20210103T141256_VVP240_INT80_G_ueF_2F16_amp.tif', 'ingrams/S1BB_20191216T141251_20210103T141256_VVP384_INT80_G_ueF_04BE/S1BB_20191216T141251_20210103T141256_VVP384_INT80_G_ueF_04BE_amp.tif', 'ingrams/S1BB_20201128T141258_20210103T141256_VVP036_INT80_G_ueF_D855/S1BB_20201128T141258_20210103T141256_VVP036_INT80_G_ueF_D855_amp.tif', 'ingrams/S1BB_20190725T141249_20210103T141256_VVP528_INT80_G_ueF_9805/S1BB_20190725T141249_20210103T141256_VVP528_INT80_G_ueF_9805_amp.tif', 'ingrams/S1BB_20200707T141254_20210103T141256_VVP180_INT80_G_ueF_E339/S1BB_20200707T141254_20210103T141256_VVP180_INT80_G_ueF_E339_amp.tif', 'ingrams/S1BB_20201011T141258_20210103T141256_VVP084_INT80_G_ueF_1BC5/S1BB_20201011T141258_20210103T141256_VVP084_INT80_G_ueF_1BC5_amp.tif', 'ingrams/S1BB_20201104T141258_20210103T141256_VVP060_INT80_G_ueF_EA59/S1BB_20201104T141258_20210103T141256_VVP060_INT80_G_ueF_EA59_amp.tif', 'ingrams/S1BB_20190526T141245_20210103T141256_VVP588_INT80_G_ueF_25B7/S1BB_20190526T141245_20210103T141256_VVP588_INT80_G_ueF_25B7_amp.tif', 'ingrams/S1BB_20201222T141257_20210103T141256_VVP012_INT80_G_ueF_A80C/S1BB_20201222T141257_20210103T141256_VVP012_INT80_G_ueF_A80C_amp.tif']"
 if str(amp_paths) == test_amp_pths:
     test.log_test('p', f"amp_paths == {test_amp_pths}")
 else:
     test.log_test('f', f"amp_paths == {amp_paths}, NOT {test_amp_pths}")
 '''
-test.add_test_cell("amp_paths = get_tiff_paths(amp_wild_path)", test_amp_paths)
+test.add_test_cell('amp_wild_path    = f"{ingram_folder}/*/*_amp.tif"', test_amp_paths)
 
 # Confirm correct average heading
 test_avg_hdg = '''
-test_average_heading = "194.40839831999998"
+test_average_heading = "194.40839832"
 if str(heading_avg) == test_average_heading:
     test.log_test('p', f"heading_avg == {test_average_heading}")
 else:
@@ -202,7 +205,7 @@ test.add_test_cell("if os.path.exists(full_scene):", test_full_scene_tif)
 
 # Confirm size of full_scene.tif is as expected
 test_full_scene_size = '''
-expected_size = "45766790"
+expected_size = "45712554"
 actual_size = str(os.path.getsize(f"{analysis_directory}/full_scene.tif"))
 if actual_size == expected_size:
     test.log_test("p", f"Size of full_scene.tif is {expected_size}")
@@ -213,11 +216,11 @@ test.add_test_cell("if os.path.exists(full_scene):", test_full_scene_size)
 
 # Confirm AOI coordinate transformation
 test_geographic_coords = ''' 
-expected_coords = "[[571661.7502143616, 5204960.176075896], [656676.9600467023, 5092803.960287691]]"
+expected_coords = "[[571821.7502143616, 5204800.176075896], [656836.9600467023, 5092643.960287691]]"
 if str(aoi_coords) == expected_coords:
     test.log_test('p', f"Expected AOI geographic coordinates == {expected_coords}")
 else:
-    test.log_test('f', f"Expected AOI geographic coordinated == {aoi_coords}, NOT {expected_coords}")   
+    test.log_test('f', f"Expected AOI geographic coordinates == {aoi_coords}, NOT {expected_coords}")   
 '''
 test.add_test_cell("except TypeError:", test_geographic_coords)
 
@@ -282,7 +285,7 @@ test.add_test_cell("ref_dates, sec_dates = (list(t) for t in zip(*sorted(zip(ref
 
 # Confirm existence of subset files renamed for TRAIN
 test_subset_rename = '''
-expected_subset_rename = "['20200812_20210103_corr.tif', '20190725_20210103_unw_phase.tif', '20200707_20210103_amp.tif', '20191216_20210103_unw_phase.tif', '20201104_20210103_unw_phase.tif', '20200812_20210103_unw_phase.tif', '20200613_20210103_unw_phase.tif', '20201104_20210103_corr.tif', '20201011_20210103_unw_phase.tif', '20200321_20210103_amp.tif', '20201011_20210103_corr.tif', '20200707_20210103_unw_phase.tif', '20200508_20210103_unw_phase.tif', '20190725_20210103_corr.tif', '20190408_20210103_unw_phase.tif', '20191122_20210103_unw_phase.tif', '20191216_20210103_amp.tif', '20200508_20210103_corr.tif', '20200321_20210103_unw_phase.tif', '20200613_20210103_amp.tif', '20201011_20210103_amp.tif', '20200707_20210103_corr.tif', '20200202_20210103_corr.tif', '20200812_20210103_amp.tif', '20201222_20210103_corr.tif', '20191122_20210103_amp.tif', '20200202_20210103_amp.tif', '20200508_20210103_amp.tif', '20201128_20210103_corr.tif', '20201222_20210103_amp.tif', '20201128_20210103_unw_phase.tif', '20191216_20210103_corr.tif', '20190408_20210103_corr.tif', '20191122_20210103_corr.tif', '20201128_20210103_amp.tif', '20201104_20210103_amp.tif', '20190526_20210103_unw_phase.tif', '20201222_20210103_unw_phase.tif', '20190408_20210103_amp.tif', '20190725_20210103_amp.tif', '20200321_20210103_corr.tif', '20190526_20210103_amp.tif', '20200202_20210103_unw_phase.tif', '20200613_20210103_corr.tif', '20190526_20210103_corr.tif']"
+expected_subset_rename = "['20200613_20210103_corr.tif', '20200508_20210103_corr.tif', '20200812_20210103_amp.tif', '20201222_20210103_unw_phase.tif', '20201222_20210103_corr.tif', '20201128_20210103_unw_phase.tif', '20191216_20210103_unw_phase.tif', '20200202_20210103_corr.tif', '20200508_20210103_amp.tif', '20200613_20210103_amp.tif', '20200707_20210103_corr.tif', '20191122_20210103_corr.tif', '20190526_20210103_corr.tif', '20200707_20210103_amp.tif', '20200812_20210103_corr.tif', '20190725_20210103_corr.tif', '20190725_20210103_unw_phase.tif', '20201011_20210103_unw_phase.tif', '20201104_20210103_corr.tif', '20190526_20210103_amp.tif', '20201222_20210103_amp.tif', '20200321_20210103_unw_phase.tif', '20200707_20210103_unw_phase.tif', '20191216_20210103_corr.tif', '20201128_20210103_amp.tif', '20190526_20210103_unw_phase.tif', '20200508_20210103_unw_phase.tif', '20201011_20210103_corr.tif', '20191216_20210103_amp.tif', '20191122_20210103_amp.tif', '20190408_20210103_corr.tif', '20200202_20210103_unw_phase.tif', '20200202_20210103_amp.tif', '20201104_20210103_unw_phase.tif', '20200812_20210103_unw_phase.tif', '20190408_20210103_amp.tif', '20200321_20210103_corr.tif', '20200613_20210103_unw_phase.tif', '20200321_20210103_amp.tif', '20190725_20210103_amp.tif', '20201104_20210103_amp.tif', '20201011_20210103_amp.tif', '20191122_20210103_unw_phase.tif', '20201128_20210103_corr.tif', '20190408_20210103_unw_phase.tif']"
 actual_subset_rename = str(files_subset)
 if actual_subset_rename == expected_subset_rename:
     test.log_test('p', f"Renamed subset files == {expected_subset_rename}")
@@ -293,7 +296,7 @@ test.add_test_cell("rename_files_for_train(subset_folder, files)",test_subset_re
 
 # Confirm existence of converted files renamed for TRAIN
 test_converted_rename = '''
-expected_converted_rename = "['20190725_20210103_unw_phase.tif', '20191216_20210103_unw_phase.tif', '20201104_20210103_unw_phase.tif', '20200812_20210103_unw_phase.tif', '20200613_20210103_unw_phase.tif', '20201011_20210103_unw_phase.tif', '20200707_20210103_unw_phase.tif', '20200508_20210103_unw_phase.tif', '20190408_20210103_unw_phase.tif', '20191122_20210103_unw_phase.tif', '20200321_20210103_unw_phase.tif', '20201128_20210103_unw_phase.tif', '20190526_20210103_unw_phase.tif', '20201222_20210103_unw_phase.tif', '20200202_20210103_unw_phase.tif']"
+expected_converted_rename = "['20201222_20210103_unw_phase.tif', '20201128_20210103_unw_phase.tif', '20191216_20210103_unw_phase.tif', '20190725_20210103_unw_phase.tif', '20201011_20210103_unw_phase.tif', '20200321_20210103_unw_phase.tif', '20200707_20210103_unw_phase.tif', '20190526_20210103_unw_phase.tif', '20200508_20210103_unw_phase.tif', '20200202_20210103_unw_phase.tif', '20201104_20210103_unw_phase.tif', '20200812_20210103_unw_phase.tif', '20200613_20210103_unw_phase.tif', '20191122_20210103_unw_phase.tif', '20190408_20210103_unw_phase.tif']"
 actual_converted_rename = str(files_converted)
 if actual_converted_rename == expected_converted_rename:
     test.log_test('p', f"Renamed converted files == {expected_converted_rename}")
@@ -324,7 +327,7 @@ test.add_test_cell("print(bin_paths)", test_train_bin)
 
 # Confirm existence of files correctied via TRAIN
 test_corrected_tifs = '''
-expected_corrected_tifs = "['/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20190408_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20190725_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200202_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201222_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201128_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201104_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200812_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201011_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200321_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200613_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200508_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20190526_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200707_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20191122_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20191216_20210103_unw_phase_corrected.tif']"
+expected_corrected_tifs = "['/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200707_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201128_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201011_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200321_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200613_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20190725_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200508_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201222_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200812_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20200202_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20190408_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20201104_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20191122_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20190526_20210103_unw_phase_corrected.tif', '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingram_subsets_converted/20191216_20210103_unw_phase_corrected.tif']"
 if str(cor_paths) == expected_corrected_tifs:
     test.log_test('p', f"cor_paths == {expected_corrected_tifs}")
 else:
@@ -332,38 +335,38 @@ else:
 '''
 test.add_test_cell("cor_paths = get_tiff_paths(paths_cor)", test_corrected_tifs)
 
-# Confirm mean value of corrected numpy array
-test_corrected_numpy = '''
-#expected_corr_mean = "-0.7425961494445801"
-expected_corr_mean = "-0.7426"
-if str(np.around((np.mean(im_c)), decimals = 4)) == expected_corr_mean:
-    test.log_test('p', f"np.around((np.mean(im_c)), decimals = 4) == {expected_corr_mean}")
-else:
-    test.log_test('f', f"np.around((np.mean(im_c)), decimals = 4) == {np.around((np.mean(im_c)), decimals = 4)}, NOT {expected_corr_mean}")
-'''
-test.add_test_cell("im_c = corrected.GetRasterBand(1).ReadAsArray()",test_corrected_numpy)
+# # Confirm mean value of corrected numpy array
+# test_corrected_numpy = '''
+# #expected_corr_mean = "-0.7425961494445801"
+# expected_corr_mean = "-0.7426"
+# if str(np.around((np.mean(im_c)), decimals = 4)) == expected_corr_mean:
+#     test.log_test('p', f"np.around((np.mean(im_c)), decimals = 4) == {expected_corr_mean}")
+# else:
+#     test.log_test('f', f"np.around((np.mean(im_c)), decimals = 4) == {np.around((np.mean(im_c)), decimals = 4)}, NOT {expected_corr_mean}")
+# '''
+# test.add_test_cell("im_c = corrected.GetRasterBand(1).ReadAsArray()",test_corrected_numpy)
 
-# Confirm mean value of uncorrected numpy array
-test_uncorrected_numpy = '''
-#expected_uncorr_mean = "5.195372104644775"
-expected_uncorr_mean = "5.1954"
-if str(np.around((np.mean(im_u)), decimals = 4)) == expected_uncorr_mean:
-    test.log_test('p', f"np.around((np.mean(im_u)), decimals = 4) == {expected_uncorr_mean}")
-else:
-    test.log_test('f', f"np.around((np.mean(im_u)), decimals = 4) == {np.around((np.mean(im_u)), decimals = 4)}, NOT {expected_uncorr_mean}")
-'''
-test.add_test_cell("im_u = uncorrected.GetRasterBand(1).ReadAsArray()",test_uncorrected_numpy)
+# # Confirm mean value of uncorrected numpy array
+# test_uncorrected_numpy = '''
+# #expected_uncorr_mean = "5.195372104644775"
+# expected_uncorr_mean = "5.1954"
+# if str(np.around((np.mean(im_u)), decimals = 4)) == expected_uncorr_mean:
+#     test.log_test('p', f"np.around((np.mean(im_u)), decimals = 4) == {expected_uncorr_mean}")
+# else:
+#     test.log_test('f', f"np.around((np.mean(im_u)), decimals = 4) == {np.around((np.mean(im_u)), decimals = 4)}, NOT {expected_uncorr_mean}")
+# '''
+# test.add_test_cell("im_u = uncorrected.GetRasterBand(1).ReadAsArray()",test_uncorrected_numpy)
 
-# Confirm mean value of difference numpy array
-test_difference_numpy = '''
-#expected_difference_mean = "-5.937968730926514"
-expected_difference_mean = "-5.93797"
-if str(np.around((np.mean(difference)), decimals = 5)) == expected_difference_mean:
-    test.log_test('p', f"np.around((np.mean(difference)), decimals = 5) == {expected_difference_mean}")
-else:
-    test.log_test('f', f"np.around((np.mean(difference)), decimals = 5) == {np.around((np.mean(difference)), decimals = 5)}, NOT {expected_difference_mean}")
-'''
-test.add_test_cell("difference = np.subtract(im_c, im_u)",test_difference_numpy)
+# # Confirm mean value of difference numpy array
+# test_difference_numpy = '''
+# #expected_difference_mean = "-5.937968730926514"
+# expected_difference_mean = "-5.93797"
+# if str(np.around((np.mean(difference)), decimals = 5)) == expected_difference_mean:
+#     test.log_test('p', f"np.around((np.mean(difference)), decimals = 5) == {expected_difference_mean}")
+# else:
+#     test.log_test('f', f"np.around((np.mean(difference)), decimals = 5) == {np.around((np.mean(difference)), decimals = 5)}, NOT {expected_difference_mean}")
+# '''
+# test.add_test_cell("difference = np.subtract(im_c, im_u)",test_difference_numpy)
 
 # Confirm TRAIN coordinate system EPSG code
 test_train_epsg = '''
@@ -397,7 +400,7 @@ test.add_test_cell("pixels_lines = get_pixels_lines(tiff_paths)",test_pixels_lin
 
 # Confirm pickle contents
 test_pickle_content = '''
-expected_pickle_content = "{'ingram_folder': 'ingrams', 'subset_folder': 'ingram_subsets', 'corrected_folder': 'ingram_subsets_converted', 'heading_avg': 194.40839831999998, 'utm': '32610'}"
+expected_pickle_content = "{'ingram_folder': 'ingrams', 'subset_folder': 'ingram_subsets', 'corrected_folder': 'ingram_subsets_converted', 'heading_avg': 194.40839832, 'utm': '32610'}"
 if str(to_pickle) == expected_pickle_content:
     test.log_test('p', f"to_pickle == {expected_pickle_content}")
 else:
