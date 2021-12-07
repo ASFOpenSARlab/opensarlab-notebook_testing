@@ -15,9 +15,8 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = \"/home/jovyan/notebooks/ASF/GEOS_657_Labs/2019/lab_6_data\""
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_lab_6"
-_replacement = f"path = f\"{test_data_path}\""
+_to_replace = 'path = f"{os.getcwd()}/lab_6_data"'
+_replacement = 'path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_data_GEOS657lab_6"'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
 # remove template code cells for HW problems
@@ -32,7 +31,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["import url_widget as url_w",
            "if env[0] != '/home/jovyan/.local/envs/insar_analysis':"]
 
 for search_str in skip_em:

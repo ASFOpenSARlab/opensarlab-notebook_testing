@@ -47,7 +47,7 @@ conda activate /home/jovyan/.local/envs/insar_analysis
 pip install astor
 ## Run tests on notebooks that use insar_analysis environment
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_InSAR_volcano_source_modeling.py
-#python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
 ## Deactivate insar_analysis environment
 conda deactivate
 ##Re-install and activate the machine learning conda environment
