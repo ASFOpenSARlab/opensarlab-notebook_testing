@@ -15,7 +15,7 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = 'path = f"{os.getcwd()}/lab_4_data"'
+_to_replace = 'f"{os.getcwd()}/lab_4_data"'
 _replacement = 'path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS657_data_lab_4"'
 test.replace_line(_to_replace, _to_replace, _replacement)
 
