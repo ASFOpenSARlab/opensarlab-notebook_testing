@@ -4,6 +4,7 @@ from getpass import getpass
 from pathlib import Path
 import shutil
 import glob
+import subprocess as sp
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -32,15 +33,72 @@ except:
 skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/hydrosar':",
            "display(delete)",
-           "if 'Delete' in delete.value:"]
+           "if 'Delete' in delete.value:",
+           "def get_tiff_paths(paths: str) -> list:",
+           "f = FileChooser(Path.cwd())"]
 
 for search_str in skip_em:
     test.replace_cell(search_str)
     
-# Replace inline shell command with rglob
-_to_replace = '    tiff_paths = !ls $paths | sort -t_ -k5,5'
-_replacement = "    tiff_paths = list(Path(paths).rglob('*.tiff')).sort()"
+# # Replace inline shell command with rglob
+# _to_replace = '    tiff_paths = !ls $paths | sort -t_ -k5,5'
+# _replacement = "    tiff_paths = sp.getoutput('ls {paths} | sort -t_ -k5,5')"
+# test.replace_line(_to_replace, _to_replace, _replacement)
+
+# Replace first case of get_tiff_paths
+_to_replace = "mask_directory = tiff_dir/'Water_Masks'"
+_replacement = """
+mask_directory = tiff_dir/'Water_Masks'
+
+if not mask_directory.exists():
+    mask_directory.mkdir()
+    
+paths = tiff_dir/"*_V*.tif*"
+if tiff_dir.exists():
+    temp_tiff_paths = sp.getoutput('ls /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_hydrosar_lab2/*_V*.tif* | sort -t_ -k5,5')
+    tiff_paths = list(temp_tiff_paths.split())
+"""
+test.replace_cell(_to_replace, _replacement)
+
+
+# Replace second and third cases of get_tiff_paths
+_to_replace = "class SARDualPolError(Exception):"
+_replacement = """
+class SARDualPolError(Exception):
+    '''
+    Raise when expecting dual-pol SAR data
+    but single-pol found instead
+    '''
+    pass
+
+vv_wild = tiff_dir/'*_VV.tif*'
+vh_wild = tiff_dir/'*_VH.tif*'
+
+if tiff_dir.exists():
+    temp_vh_paths = sp.getoutput('ls /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_hydrosar_lab2/*_VH.tif* | sort -t_ -k5,5')
+    vh_paths = list(temp_vh_paths.split())
+    temp_vv_paths = sp.getoutput('ls /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_hydrosar_lab2/*_VV.tif* | sort -t_ -k5,5')
+    vv_paths = list(temp_vv_paths.split())
+
+for i, pth in enumerate(vv_paths):
+    vh = f"{pth.split('_V')[0]}_VH{Path(pth).suffix}"
+    if vh not in vh_paths:
+        raise SARDualPolError(f"Found {pth} but not {vh}")        
+for i, pth in enumerate(vh_paths):
+    vv = f"{pth.split('_V')[0]}_VV{Path(pth).suffix}"
+    if vv not in vv_paths:
+        raise SARDualPolError(f"Found {pth} but not {vv}")
+        
+print(f"Success: dual-pol data found")
+
+"""
+test.replace_cell(_to_replace, _replacement)
+
+# Hard code the HAND layer
+_to_replace = "HAND_file = Path(f.selected)"
+_replacement = "HAND_file = '/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_hydrosar_lab2/Bangladesh_Training_DEM_hand.tif'"
 test.replace_line(_to_replace, _to_replace, _replacement)
+
 
 ######### TESTS ###########
 
