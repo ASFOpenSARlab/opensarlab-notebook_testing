@@ -32,6 +32,8 @@ from ipywidgets import Layout
 from hyp3_sdk import asf_search
 from hyp3_sdk import Batch
 
+import asf_search as asf
+
 #######################
 #  Utility Functions  #
 #######################
@@ -207,7 +209,7 @@ def vrt_to_gtiff(vrt: str, output: str):
 #  Vertex API Functions #
 #########################
 
-
+# Obsolete - change here
 def get_vertex_granule_info(granule_name: str, processing_level: int) -> dict:
     """
     Takes a string granule name and int processing level, and returns the granule info as json.<br><br>
@@ -265,9 +267,9 @@ def filter_jobs_by_date(jobs, date_range):
 def get_paths_orbits(jobs):
     vertex_API_URL = "https://api.daac.asf.alaska.edu/services/search/param"
     for job in jobs:
-        granule_metadata = asf_search.get_metadata(job.job_parameters['granules'][0])
-        job.path = granule_metadata['path']
-        job.orbit_direction = granule_metadata['flightDirection']
+        granule_metadata = asf.granule_search(job.job_parameters['granules'])[0]
+        job.path = granule_metadata.properties['pathNumber']
+        job.orbit_direction = granule_metadata.properties['flightDirection']
     return jobs
 
 def filter_jobs_by_path(jobs, paths):

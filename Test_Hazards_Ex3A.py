@@ -3,6 +3,7 @@
 from getpass import getpass
 import shutil
 import numpy
+import glob
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -16,12 +17,12 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = f\"/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}\""
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/{name}"
-_replacement = f"    path = f\"{test_data_path}\""
-test.replace_line("path = f\"/home/jovyan/notebooks/SAR_Training", _to_replace, _replacement)
+_to_replace = "path = Path(f'/home/jovyan/notebooks/SAR_Training/English/Hazards/{name}')"
+_replacement = "path = Path(f'/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex3_flood')"
+test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/hazards_test_Ex3_flood"
 try:
    shutil.rmtree(test_data_path)
 except:
@@ -29,7 +30,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
@@ -44,7 +45,7 @@ test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if os.path.exists(f"{path}/{time_series}"):
+if Path(f"{time_series}").exists():
     test.log_test('p', f"{time_series} successfully copied from {time_series_path}")
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
@@ -53,21 +54,21 @@ test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series
 
 # Confirm that all expected tiffs were extracted from the tarball
 test_tarball_extraction = """
-test_tiff_qty = len(glob("tiffsflood/*.tif"))
+test_tiff_qty = len(glob.glob(f"{path}/tiffsflood/*.tif"))
 if test_tiff_qty == 17:
     test.log_test('p', f"17 tiffs extracted, as expected") 
 else:
     test.log_test('f', f"{test_tiff_qty} tiffs extracted, NOT 17")
-if os.path.exists(f"{os.getcwd()}/stackflood_VV.vrt"):
-    test.log_test('p', f"{os.getcwd()}/stackflood_VV.vrt found")
+if Path(f"{path}/stackflood_VV.vrt").exists():
+    test.log_test('p', f"{path}/stackflood_VV.vrt found")
 else:
-    test.log_test('f', f"{os.getcwd()}/stackflood_VV.vrt NOT found")
-if os.path.exists(f"{os.getcwd()}/datesflood_VV.csv"):
-    test.log_test('p', f"{os.getcwd()}/datesflood_VV.csv found")
+    test.log_test('f', f"{path}/stackflood_VV.vrt NOT found")
+if Path(f"{path}/datesflood_VV.csv").exists():
+    test.log_test('p', f"{path}/datesflood_VV.csv found")
 else:
-    test.log_test('f', f"{os.getcwd()}/datesflood_VV.csv NOT found")
+    test.log_test('f', f"{path}/datesflood_VV.csv NOT found")
 """
-test.add_test_cell("!tar -xvzf {name}.tar.gz", test_tarball_extraction)
+test.add_test_cell("!tar -xvzf {time_series} -C {path}", test_tarball_extraction)
 
 # Confirm len(dates) == 17
 test_dates = """
@@ -76,7 +77,7 @@ if len(dates) == 17:
 else:
     test.log_test('f', f"len(dates) == {len(dates)}, NOT 17")
 """
-test.add_test_cell("dates = get_dates(tiff_paths)", test_dates)
+test.add_test_cell("else get_dates_sub(path, 'tiffsflood/*.tif*')", test_dates)
 
 # Confirm rasterstack type and shape
 test_rasterstack = """
@@ -131,12 +132,12 @@ test.add_test_cell("geotrans = img_handle.GetGeoTransform()", test_img_stats)
     
 # Confirm creation of RCSTimeSeries--1.842° -79.627°.png
 test_rcstimeseries_png = """
-if os.path.exists(figname):
+if Path(f"{path}/{figname}").exists():
     test.log_test('p', f"{figname} found")
 else:
     test.log_test('f', f"{figname} NOT found")
 """
-test.add_test_cell("plt.savefig(figname,", test_rcstimeseries_png)
+test.add_test_cell("plt.savefig(path/figname, dpi=300, transparent='true')", test_rcstimeseries_png)
 
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########

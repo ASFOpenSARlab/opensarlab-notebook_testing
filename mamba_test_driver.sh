@@ -15,10 +15,10 @@ for f in /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs
     rm $f
 done
 ## Re-install and activate rtc_analysis conda environment
-conda init bash
+mamba init bash
 source ~/.bashrc
-conda env create -f '/home/jovyan/conda_environments/Environment_Configs/rtc_analysis_env.yml' --prefix "/home/jovyan/.local/envs/rtc_analysis" --force
-conda run -n rtc_analysis kernda --display-name rtc_analysis -o /home/jovyan/.local/envs/rtc_analysis/share/jupyter/kernels/python3/kernel.json
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/rtc_analysis_env.yml' --prefix "/home/jovyan/.local/envs/rtc_analysis" --force
+mamba run -n rtc_analysis kernda --display-name rtc_analysis -o /home/jovyan/.local/envs/rtc_analysis/share/jupyter/kernels/python3/kernel.json
 conda activate /home/jovyan/.local/envs/rtc_analysis
 pip install astor
 ## Run tests on notebooks that use rtc_analysis environment
@@ -39,8 +39,8 @@ python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_Subset_Data_Stack.p
 ## Deactivate rtc_analysis environment
 conda deactivate
 ##Re-install and activate insar_analysis conda environment
-conda env create -f '/home/jovyan/conda_environments/Environment_Configs/insar_analysis_env.yml' --prefix "/home/jovyan/.local/envs/insar_analysis" --force
-conda run -n insar_analysis kernda --display-name insar_analysis -o /home/jovyan/.local/envs/insar_analysis/share/jupyter/kernels/python3/kernel.json
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/insar_analysis_env.yml' --prefix "/home/jovyan/.local/envs/insar_analysis" --force
+mamba run -n insar_analysis kernda --display-name insar_analysis -o /home/jovyan/.local/envs/insar_analysis/share/jupyter/kernels/python3/kernel.json
 conda init
 source /home/jovyan/conda_environments/install_insar_analysis_pkgs.sh
 conda activate /home/jovyan/.local/envs/insar_analysis
@@ -51,8 +51,8 @@ python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab6.py
 ## Deactivate insar_analysis environment
 conda deactivate
 ##Re-install and activate the machine learning conda environment
-conda env create -f '/home/jovyan/conda_environments/Environment_Configs/machine_learning_env.yml' --prefix "/home/jovyan/.local/envs/machine_learning" --force
-conda run -n machine_learning kernda --display-name machine_learning -o /home/jovyan/.local/envs/machine_learning/share/jupyter/kernels/python3/kernel.json
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/machine_learning_env.yml' --prefix "/home/jovyan/.local/envs/machine_learning" --force
+mamba run -n machine_learning kernda --display-name machine_learning -o /home/jovyan/.local/envs/machine_learning/share/jupyter/kernels/python3/kernel.json
 conda init
 conda activate /home/jovyan/.local/envs/machine_learning
 pip install astor
@@ -61,8 +61,8 @@ python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detecti
 ## Deactivate machine_learning environment
 conda deactivate
 ##Re-install and activate the train conda environment
-conda env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
-conda run -n train kernda --display-name train -o /home/jovyan/.local/envs/train/share/jupyter/kernels/python3/kernel.json
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
+mamba run -n train kernda --display-name train -o /home/jovyan/.local/envs/train/share/jupyter/kernels/python3/kernel.json
 conda init
 conda activate /home/jovyan/.local/envs/train
 pip install astor

@@ -2,6 +2,8 @@
 
 from getpass import getpass
 import shutil
+import glob
+import os
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
@@ -14,12 +16,12 @@ log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
 test = ASFNotebookTest(notebook_pth, log_pth)
 
 # Change data path for testing
-_to_replace = "path = \"/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_time_series_example\""
-test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_time_series_example"
-_replacement = f"path = \"{test_data_path}\""
-test.replace_line(_to_replace, _to_replace, _replacement)
+_to_replace = 'path = Path("/home/jovyan/notebooks/SAR_Training/English/Ecosystems/data_time_series_example")'
+_test_data_path = 'path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_time_series_example")'
+test.replace_line(_to_replace, _to_replace, _test_data_path)
 
 # Erase data directory if already present
+test_data_path = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_time_series_example"
 try:
    shutil.rmtree(test_data_path)
 except:
@@ -27,7 +29,7 @@ except:
 
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
-skip_em = ["var kernel = Jupyter.notebook.kernel;",
+skip_em = ["notebookUrl = url_w.URLWidget()",
            "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
 
 for search_str in skip_em:
@@ -37,7 +39,7 @@ for search_str in skip_em:
 
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
-if os.path.exists(f"{os.getcwd()}/{time_series_path}"):
+if Path(f"{time_series_path}").exists():
     test.log_test('p', f"{time_series_path} successfully copied from {s3_path}")
 else:
     test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
@@ -46,25 +48,24 @@ test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $s3_path $ti
 
 # Confirm we have extracted 828 files from the zip
 test_extract = """
-import glob
 test_zip_extract_length = 0
-for _, _, test_filenames in os.walk('time_series'):
+for _, _, test_filenames in os.walk(str(path/"time_series")):
     test_zip_extract_length += len(test_filenames)
 if test_zip_extract_length == 828:
     test.log_test('p', f"828 files were extracted from the zip")
 else:
     test.log_test('f', f"{test_zip_extract_length} files were extracted from the zip, NOT 828")              
 """
-test.add_test_cell("asf_unzip(os.getcwd(), time_series_path)", test_extract)
+test.add_test_cell("asfn.asf_unzip(str(path), time_series_path)", test_extract)
 
 # Confirm we are in datadirectoy
 test_datadirectory = """
-if os.getcwd() == f"{path}/{datadirectory}":
-    test.log_test('p', f"os.getcwd() == {path}/{datadirectory}")
+if Path(f"{datadirectory}").exists():
+    test.log_test('p', f"{datadirectory} Exists")
 else:
-    test.log_test('f', f"os.getcwd() == {os.getcwd()}, NOT {path}/{datadirectory}")
+    test.log_test('f', f"{datadirectory} does NOT Exist")
 """
-test.add_test_cell("os.chdir(datadirectory)", test_datadirectory)
+test.add_test_cell("# !ls {datadirectory}/*vrt #Uncomment this line to see a List of the files", test_datadirectory)
 
 # Confirm tindex has dtype = datetime64[ns], freq = None, and length = 70
 test_tindex = """
@@ -103,7 +104,7 @@ if img.RasterYSize == 1270:
 else:
     test.log_test('f', f"img.RasterYSize == {img.RasterYSize}, NOT 1270")
 """
-test.add_test_cell("img = gdal.Open(imagefile)", test_img)
+test.add_test_cell("img = gdal.Open(str(imagefile))", test_img)
 
 # Confirm caldB.shape == (70, 600, 600)
 test_caldB = """
@@ -147,25 +148,25 @@ if img_cross.RasterYSize == 1270:
 else:
     test.log_test('f', f"img_cross.RasterYSize == {img_cross.RasterYSize}, NOT 1270")
 """
-test.add_test_cell("img_cross = gdal.Open(imagefile_cross)", test_img_cross)
+test.add_test_cell("img_cross = gdal.Open(str(imagefile_cross))", test_img_cross)
 
 # Confirm creation of product_path
 test_product_path = """ 
-if os.path.exists(f"{path}/{product_path}"):
-    test.log_test('p', f"{path}/{product_path} found")
+if Path(f"{product_path}").exists():
+    test.log_test('p', f"{product_path} found")
 else:
-    test.log_test('f', f"{path}/{product_path} NOT found")
+    test.log_test('f', f"{product_path} NOT found")
 """
-test.add_test_cell("product_path = 'plots_and_animations'", test_product_path)
+test.add_test_cell("product_path = path/'plots_and_animations'", test_product_path)
 
 # Confirm creation of animation.gif
 test_animation = """
-if os.path.exists(f"{path}/{product_path}/animation.gif"):
-    test.log_test('p', f"{path}/{product_path}/animation.gif found")
+if Path(f"{product_path}/animation.gif").exists():
+    test.log_test('p', f"{product_path}/animation.gif found")
 else:
-    test.log_test('f', f"{path}/{product_path}/animation.gif NOT found")
+    test.log_test('f', f"{product_path}/animation.gif NOT found")
 """
-test.add_test_cell("ani.save('animation.gif', writer='pillow', fps=2)", test_animation)
+test.add_test_cell("ani.save(product_path/'animation.gif', writer='pillow', fps=2)", test_animation)
 
 # Confirm rs_means_pwr.shape == (70,)
 test_rs_means_pwr = """
@@ -178,21 +179,21 @@ test.add_test_cell("rs_means_pwr.shape", test_rs_means_pwr)
 
 # Confirm creation of time_series_means
 test_time_series_means = """ 
-if os.path.exists(f"{path}/{product_path}/time_series_means.png"):
-    test.log_test('p', f"{path}/{product_path}/time_series_means.png found")
+if Path(f"{product_path}/time_series_means.png").exists():
+    test.log_test('p', f"{product_path}/time_series_means.png found")
 else:
-    test.log_test('f', f"{path}/{product_path}/time_series_means.png NOT found")
+    test.log_test('f', f"{product_path}/time_series_means.png NOT found")
 """
-test.add_test_cell("plt.savefig('time_series_means'", test_time_series_means)
+test.add_test_cell("plt.savefig(product_path/'time_series_means', dpi=72, transparent='true')", test_time_series_means)
                    
 # Confirm creation of animation_histogram.gif
 test_animation_histogram = """ 
-if os.path.exists(f"{path}/{product_path}/animation_histogram.gif"):
-    test.log_test('p', f"{path}/{product_path}/animation_histogram.gif found")
+if Path(f"{product_path}/animation_histogram.gif").exists():
+    test.log_test('p', f"{product_path}/animation_histogram.gif found")
 else:
-    test.log_test('f', f"{path}/{product_path}/animation_histogram.gif NOT found")
+    test.log_test('f', f"{product_path}/animation_histogram.gif NOT found")
 """
-test.add_test_cell("ani.save('animation_histogram.gif'", test_animation_histogram)
+test.add_test_cell("ani.save(product_path/'animation_histogram.gif', writer='pillow', fps=2)", test_animation_histogram)
                    
 
 ######## RUN THE NOTEBOOK AND TEST CODE #########
