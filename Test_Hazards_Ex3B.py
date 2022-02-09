@@ -47,7 +47,7 @@ if Path(f"{time_series}").exists():
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the zip
 test_zip_extraction = """

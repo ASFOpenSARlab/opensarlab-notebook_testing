@@ -41,11 +41,11 @@ for search_str in skip_em:
 test_s3_copy = """
 f = Path("Niamey.zip")
 if f.exists():
-    test.log_test('p', f"Niamey.zip successfully copied from s3://asf-jupyter-data/Niamey.zip")
+    test.log_test('p', f"Niamey.zip successfully copied from s3://asf-jupyter-data-west/Niamey.zip")
 else:
-    test.log_test('f', f"Niamey.zip NOT copied from s3://asf-jupyter-data/Niamey.zip")
+    test.log_test('f', f"Niamey.zip NOT copied from s3://asf-jupyter-data-west/Niamey.zip")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip Niamey.zip", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp s3://asf-jupyter-data-west/Niamey.zip Niamey.zip", test_s3_copy)
 
 # Confirm that all expected files were extracted from the zip
 test_zip_extraction = """

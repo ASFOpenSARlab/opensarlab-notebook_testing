@@ -48,7 +48,7 @@ else:
 """
 #test.add_test_cell("subprocess.check_call(['aws', 's3', 'cp',  deformation_map_path, deformation_map])",
 #                   test_s3_copy)
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $deformation_map_path $deformation_map", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp $deformation_map_path $deformation_map", test_s3_copy)
 
 # Confirm observed_deformation_map.shape == (980, 1100)
 test_observed_deformation_map = """

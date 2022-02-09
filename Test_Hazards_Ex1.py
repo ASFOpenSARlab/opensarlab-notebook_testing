@@ -42,7 +42,7 @@ if Path(f"{analysis_dir/time_series_path}").exists():
 else:
     test.log_test('f', f"{time_series_path} NOT copied from {s3_path}")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $s3_path {analysis_dir/time_series_path}", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp $s3_path {analysis_dir/time_series_path}", test_s3_copy)
 
 # Check that 152 tiffs, 2 csvs, and 2 vrts were extracted from the tarball
 test_extract = """

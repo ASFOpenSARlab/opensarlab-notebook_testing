@@ -44,7 +44,7 @@ if Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/data_InSA
 else:
     test.log_test('f', f"{deformation_map} NOT successfully copied from {deformation_map_path}")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $deformation_map_path $deformation_map",
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp $deformation_map_path $deformation_map",
                    test_s3_copy)
 
 # Confirm observed_deformation_map.shape == (980, 1100)

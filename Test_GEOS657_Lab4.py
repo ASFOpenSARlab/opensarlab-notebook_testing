@@ -48,11 +48,11 @@ for search_str in skip_em:
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
 if os.path.exists(f"{os.getcwd()}/time_series.zip"):
-    test.log_test('p', f"time_series.zip successfully copied from s3://asf-jupyter-data/time_series.zip")
+    test.log_test('p', f"time_series.zip successfully copied from s3://asf-jupyter-data-west/time_series.zip")
 else:
-    test.log_test('f', f"time_series.zip NOT copied from s3://asf-jupyter-data/time_series.zip")
+    test.log_test('f', f"time_series.zip NOT copied from s3://asf-jupyter-data-west/time_series.zip")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 
 # Confirm that all expected files were extracted from the zip

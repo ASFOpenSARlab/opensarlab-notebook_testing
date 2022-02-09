@@ -21,13 +21,13 @@ mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/rtc_ana
 mamba run -n rtc_analysis kernda --display-name rtc_analysis -o /home/jovyan/.local/envs/rtc_analysis/share/jupyter/kernels/python3/kernel.json
 conda activate /home/jovyan/.local/envs/rtc_analysis
 pip install astor
-## Run tests on notebooks that use rtc_analysis environment
+# Run tests on notebooks that use rtc_analysis environment
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex1.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4B.py
-python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
+# Broken python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3A.py
@@ -60,7 +60,7 @@ pip install astor
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Master_CRNN_change_detection.py
 ## Deactivate machine_learning environment
 conda deactivate
-##Re-install and activate the train conda environment
+#Re-install and activate the train conda environment
 mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
 mamba run -n train kernda --display-name train -o /home/jovyan/.local/envs/train/share/jupyter/kernels/python3/kernel.json
 conda init

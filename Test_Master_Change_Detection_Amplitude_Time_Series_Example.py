@@ -33,8 +33,8 @@ for search_str in skip_em:
     test.replace_cell(search_str)
     
 # Replace download cell with explicit path. Why is this required to make the download work???
-_replacement = '!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example/Niamey.zip'
-test.replace_cell('!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip $path/Niamey.zip', _replacement)
+_replacement = '!aws --region=us-west-2 --no-sign-request s3 cp s3://asf-jupyter-data-west/Niamey.zip /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Change_Detection_Amplitude_Time_Series_Example/Niamey.zip'
+test.replace_cell('!aws --region=us-west-2 --no-sign-request s3 cp s3://asf-jupyter-data-west/Niamey.zip $path/Niamey.zip', _replacement)
 
 # Explicitly define the path to cra. Why is this necessary???
 _to_replace = "cra_path = niamey_path.cwd()/'data_Change_Detection_Amplitude_Time_Series_Example/cra'"
@@ -60,11 +60,11 @@ test.add_test_cell('if not path.is_dir():', test_working_dir)
 # Check that the data was downloaded from the S3 bucket
 test_s3_copy = """
 if Path(f"{path}/Niamey.zip").exists():
-    test.log_test('p', "Niamey.zip successfully copied from s3://asf-jupyter-data/Niamey.zip")
+    test.log_test('p', "Niamey.zip successfully copied from s3://asf-jupyter-data-west/Niamey.zip")
 else:
-    test.log_test('f', "Niamey.zip NOT copied from s3://asf-jupyter-data/Niamey.zip")
+    test.log_test('f', "Niamey.zip NOT copied from s3://asf-jupyter-data-west/Niamey.zip")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/Niamey.zip $path/Niamey.zip", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp s3://asf-jupyter-data-west/Niamey.zip $path/Niamey.zip", test_s3_copy)
 
 # Confirm that all expected files were extracted from the zip
 test_zip_extraction = """

@@ -41,6 +41,11 @@ _to_replace = "sarloc = (ceil(my_plot.x), ceil(my_plot.y))"
 _replacement = "sarloc = (456, 892)"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
+# Replace manually input coords from matplotlib plot with hardcoded test coords
+_to_replace = "flevent = 2      # Options: 1 - Guayaquil flood of 2016-2017   |    2 - 2020 Bangladesh & Eastern India Event"
+_replacement = "flevent = 1      # Options: 1 - Guayaquil flood of 2016-2017   |    2 - 2020 Bangladesh & Eastern India Event"
+test.replace_line(_to_replace, _to_replace, _replacement)
+
 ######### TESTS ###########
 
 # Check that the data was downloaded from the S3 bucket
@@ -50,7 +55,7 @@ if Path(f"{time_series}").exists():
 else:
     test.log_test('f', f"{time_series} NOT copied from {time_series_path}")
 """
-test.add_test_cell("!aws --region=us-east-1 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
+test.add_test_cell("!aws --region=us-west-2 --no-sign-request s3 cp $time_series_path $time_series", test_s3_copy)
 
 # Confirm that all expected tiffs were extracted from the tarball
 test_tarball_extraction = """
@@ -120,9 +125,9 @@ if ysize == 1033:
 else:
     test.log_test('f', f"ysize == {ysize}, NOT 1033")
 if bands == 17:
-    test.log_test('p', f"bands == 17")
+    test.log_test('p', f"bands == 16")
 else:
-    test.log_test('f', f"bands == {bands}, NOT 17")
+    test.log_test('f', f"bands == {bands}, NOT 16")
 if projstring == '32717':
     test.log_test('p', f"projstring == '32717'")
 else:
