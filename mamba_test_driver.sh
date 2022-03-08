@@ -27,7 +27,7 @@ python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex2.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex3.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4A.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Ecosystems_Ex4B.py
-# Broken python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
+python3 /home/jovyan/opensarlab-notebook_testing/Test_GEOS657_Lab4.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex1.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex2.py
 python3 /home/jovyan/opensarlab-notebook_testing/Test_Hazards_Ex3A.py
