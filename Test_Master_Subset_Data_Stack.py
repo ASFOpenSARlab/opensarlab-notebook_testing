@@ -13,6 +13,8 @@ import os
 
 ######### INITIAL SETUP #########
 
+## If the test script fails, look for extra spaces in the notebook at the end of the line for the last magic !
+
 # Define path to notebook and create ASFNotebookTest object
 notebook_pth = "/home/jovyan/notebooks/SAR_Training/English/Master/Subset_Data_Stack.ipynb"
 log_pth = "/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs"
@@ -21,7 +23,24 @@ test = ASFNotebookTest(notebook_pth, log_pth)
 # Skip all cells inputing user defined values for filtering products to download
 # or those involving conda environment checks
 skip_em = ["notebookUrl = url_w.URLWidget()",
-           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':"]
+           "if env[0] != '/home/jovyan/.local/envs/rtc_analysis':",
+           "option = asfn.select_parameter([option_key[1], option_key[2] , option_key[3],], '')",
+           "display(Markdown(f'<text style=color:red>NOTE: As of now, your WKT/shapefile will work if it meets following conditions: </text>'))",
+           "raise OSError('Directory that contains your .tif files are empty.')",
+           "raise TypeError(f'{infile} is not a valid path.')",
+           "# Gets EPSG from your infile",
+           'print("Would you like to remove all instances of previous/unused shapely files?")',
+           "if choice == 2 and shp_option.value == 'Yes':",
+           "shp_name = input('Choose a name for your shapefly file: ')",
+           "# Let user input WKT (option 2)",
+           "display(Markdown(f'<text style=color:red>IT MAY CAUSE AN UNEXPECTED RESULTS.</text>'))",
+           "shp = Path(shpfc.selected)",
+           "# Extract wkt from shapefile:",
+           "print('Items from previous run exists. Would you like to keep them or remove them to generate new items?')",
+           "print('Cleaning previously generated subset file(s)...')",
+           "# Display cropped image & place cropped image on top on original image.",
+           "raise MemoryError('Subset file too big and will crash. Please regenerate your subset image using correct values.')",
+           "# Run this cell to display links"]
 
 for search_str in skip_em:
     test.replace_cell(search_str)
@@ -38,6 +57,11 @@ analysis_dir.mkdir()
 zip_path = analysis_dir/"jamalpur_stack_testing.zip"
 '''
 test.replace_cell("display(fc)", test_replace_analysis_dir)
+
+test_replace_options = '''
+choice = 1
+'''
+test.replace_cell('choice = option_key.index(option.value)', test_replace_options)
 
 # Download the data
 test_download = "!aws --region=us-east-1 --no-sign-request s3 cp s3://asf-jupyter-data/notebook_testing_data/jamalpur_stack_testing.zip /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/master_data_Test_Subset_Data_Stack/jamalpur_stack_testing.zip"
@@ -62,12 +86,12 @@ try:
     aoi.x2 = 4636.833870967743
     aoi.y1 = 3677.6806451612906
     aoi.y2 = 4780.803225806452
-    aoi_coords = [geolocation(aoi.x1, aoi.y1, geotrans, latlon=False), geolocation(aoi.x2, aoi.y2, geotrans, latlon=False)]
+    aoi_coords = [xy_to_geocoord(aoi.x1, aoi.y1, geotrans, latlon=False), xy_to_geocoord(aoi.x2, aoi.y2, geotrans, latlon=False)]
     print(f"aoi_coords in EPSG {utm}: {aoi_coords}")
 except TypeError:
     print('TypeError')
 '''
-test.replace_cell("aoi_coords = [geolocation(aoi.x1, aoi.y1", test_set_coords)
+test.replace_cell("aoi_coords = [xy_to_geocoord(aoi.x1, aoi.y1, geotrans, latlon=False), xy_to_geocoord(aoi.x2, aoi.y2, geotrans, latlon=False)]", test_set_coords)
 
 # Define subset directory
 test_sub_name = '    sub_name = "subset"'
@@ -191,7 +215,7 @@ if aoi_coords == [[166447.20967741933, 2731329.580645161], [213865.01612903227, 
 else:
     test.log_test('f', f"aoi_coords == {aoi_coords}, NOT [[166447.20967741933, 2731329.580645161], [213865.01612903227, 2698235.9032258065]]")
 '''
-test.add_test_cell("aoi_coords = [geolocation(aoi.x1, aoi.y1", test_aoi_coords)
+test.add_test_cell("aoi_coords = [xy_to_geocoord(aoi.x1, aoi.y1, geotrans, latlon=False), xy_to_geocoord(aoi.x2, aoi.y2, geotrans, latlon=False)]", test_aoi_coords)
 
 
 # Confirm creation of subset_dir
