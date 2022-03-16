@@ -106,6 +106,11 @@ for p in tiff_paths:
 '''
 test.replace_cell('print(p)', correct_tiff_paths)
 
+# replace a line that's causing trouble
+test_new_line = '        !{gdal_command}'
+test_old_line = '        !{gdal_command} # runs command'
+test.replace_line(test_old_line, test_old_line, test_new_line)
+
 # Skip file clean up widget cells
 test.replace_cell("cleanup = asfn.select_parameter(")
 test.replace_cell("if cleanup.value ==")
