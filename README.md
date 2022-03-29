@@ -26,6 +26,7 @@ touch test.log
 To run the test script manually, I like to use the following command so runtime errors are recorded:
 
 cd /home/jovyan/opensarlab-notebook_testing
+
 source mamba_test_driver.sh 2> errors.txt
 
 Setup for cron to run mamba_test_driver.sh (Note: This requires sudo access in OSL):
