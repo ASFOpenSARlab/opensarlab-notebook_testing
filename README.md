@@ -5,7 +5,9 @@ Clone the repo into /home/joyvan
 
 git clone https://github.com/ASFOpenSARlab/opensarlab-notebook_testing.git opensarlab-notebook_testing
 
+
 The test suite requires the following directories and files to be set up:
+
 
 /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev
 
@@ -29,7 +31,9 @@ cd /home/jovyan/opensarlab-notebook_testing
 
 source mamba_test_driver.sh 2> errors.txt
 
+
 Setup for cron to run mamba_test_driver.sh (Note: This requires sudo access in OSL):
+
 1) Start an instance of OpenSarlabs in Amazon Workspace (this is necessarry to keep the instance open through internet outages and other interruptions).
 2) Open a terminal in OSL
 3) sudo apt update
