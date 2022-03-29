@@ -2,17 +2,22 @@
 OpenSARlabs notebook testing module and notebook test scripts
 
 Clone the repo into /home/joyvan
+
 git clone https://github.com/ASFOpenSARlab/opensarlab-notebook_testing.git opensarlab-notebook_testing
 
 The test suite requires the following directories and files to be set up:
 /home/jovyan/opensarlab-notebook_testing/notebook_testing_dev
 /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs
 /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs
-/home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/test.log
+cd /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/
+touch test.log
 /home/jovyan/opensarlab-notebook_testing/reports
 /home/jovyan/opensarlab-notebook_testing/keep_OSL_alive
 
+
+
 To run the test script manually, I like to use the following command so runtime errors are recorded:
+
 cd /home/jovyan/opensarlab-notebook_testing
 source mamba_test_driver.sh 2> errors.txt
 
