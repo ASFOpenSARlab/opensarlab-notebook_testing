@@ -5,7 +5,7 @@ import shutil
 
 from asf_jupyter_test import ASFNotebookTest
 from asf_jupyter_test import std_out_io
-from asf_notebook import asf_unzip
+import opensarlab_lib as asfn
 from pathlib import Path
 import os
 import numpy as np
@@ -59,7 +59,7 @@ test.replace_cell(_to_replace, replacement)
 
 # Unzip the downloaded project
 test_unzip = '''
-asf_unzip("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingrams", "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/GEOS657_Lab9_2019_part1.zip")
+asfn.asf_unzip("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/ingrams", "/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/GEOS_657_2019_lab_9_data/GEOS657_Lab9_2019_part1.zip")
 zip_dir = f"{analysis_directory}/ingrams"
 os.chdir(zip_dir)
 dirpath = Path.cwd()
