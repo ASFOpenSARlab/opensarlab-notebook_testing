@@ -15,10 +15,6 @@ The test suite requires the following directories and files to be set up:
 
 /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs
 
-cd /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/
-
-touch test.log
-
 /home/jovyan/opensarlab-notebook_testing/reports
 
 /home/jovyan/opensarlab-notebook_testing/keep_OSL_alive
