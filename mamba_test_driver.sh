@@ -11,6 +11,7 @@ if [ ! -d "/home/jovyan/opensarlab-notebook_testing/reports" ]; then
   mkdir /home/jovyan/opensarlab-notebook_testing/reports
 fi
 # Remove old logs
+touch /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/test.log
 for f in /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/old_logs/*.log; do
     rm $f
 done
@@ -64,12 +65,40 @@ conda deactivate
 mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/train_env.yml' --prefix "/home/jovyan/.local/envs/train" --force
 mamba run -n train kernda --display-name train -o /home/jovyan/.local/envs/train/share/jupyter/kernels/python3/kernel.json
 conda init
+source /home/jovyan/conda_environments/train.sh
 conda activate /home/jovyan/.local/envs/train
 pip install astor
 ## Run tests on notebooks that use the train environment
 python /home/jovyan/opensarlab-notebook_testing/Test_GEOS_657_2019_Lab9_InSARTimeSeriesAnalysis_Part1_DataDownload_HyP3_v2.py
 ## Deactivate train environment
 conda deactivate
+## Install, run, activate and deactivate the other 3 environments
+## hydrosar
+touch /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/hydrosar_env.test.log
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/hydrosar_env.yml' --prefix "/home/jovyan/.local/envs/hydrosar" --force
+mamba run -n hydrosar kernda --display-name hydrosar -o /home/jovyan/.local/envs/hydrosar/share/jupyter/kernels/python3/kernel.json
+conda init
+conda activate /home/jovyan/.local/envs/hydrosar
+conda deactivate
+echo "hydrosar env install PASSED!" >> /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/hydrosar_env.test.log
+## unavco
+touch /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/unavco_env.test.log
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/unavco_env.yml' --prefix "/home/jovyan/.local/envs/unavco" --force
+mamba run -n unavco kernda --display-name unavco -o /home/jovyan/.local/envs/unavco/share/jupyter/kernels/python3/kernel.json
+conda init
+source /home/jovyan/conda_environments/unavco.sh
+conda activate /home/jovyan/.local/envs/unavco
+conda deactivate
+echo "unavco env install PASSED!" >> /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/unavco_env.test.log
+## NISAR_SE
+touch /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/nisar_se_env.test.log
+mamba env create -f '/home/jovyan/conda_environments/Environment_Configs/nisar_se_env.yml' --prefix "/home/jovyan/.local/envs/nisar_se" --force
+mamba run -n nisar_se kernda --display-name nisar_se -o /home/jovyan/.local/envs/nisar_se/share/jupyter/kernels/python3/kernel.json
+conda init
+source /home/jovyan/conda_environments/nisar_se.sh
+conda activate /home/jovyan/.local/envs/nisar_se
+conda deactivate
+echo "nisar_se env install PASSED!" >> /home/jovyan/opensarlab-notebook_testing/notebook_testing_logs/nisar_se_env.test.log
 echo 'Done running tests on the notebooks!'
 echo 'Check the logs for exceptions and failures!'
 ## Get rid of spaces in log filenames
