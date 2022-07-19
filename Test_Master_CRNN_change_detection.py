@@ -19,25 +19,11 @@ _to_replace = 'base_path = Path("/home/jovyan/notebooks/SAR_Training/English/Mas
 test_data_path = 'base_path = Path("/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_data_CRNN_change_detection")'
 test.replace_line(_to_replace, _to_replace, test_data_path)
 
-# Change 1st data path
-_to_replace = "data = sio.loadmat(str(dl_data_path/'TaizhouTm2000_norm.mat'))"
-_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTm2000_norm.mat")'
+# Change the path for data download
+_to_replace = "work_dir = Path.cwd()/'DL-data'"
+_replacement = "work_dir = Path('/home/jovyan/opensarlab-notebook_testing/notebook_testing_dev/test_data_CRNN_change_detection/DL-data')"
 test.replace_line(_to_replace, _to_replace, _replacement)
 
-# Change 2nd data path
-_to_replace = "data = sio.loadmat(str(dl_data_path/'TaizhouTm2003_norm.mat'))"
-_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTm2003_norm.mat")'
-test.replace_line(_to_replace, _to_replace, _replacement)
-
-# Change 3rd data path
-_to_replace = "data = sio.loadmat(str(dl_data_path/'TaizhouTraMapBinary.mat'))"
-_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTraMapBinary.mat")'
-test.replace_line(_to_replace, _to_replace, _replacement)
-
-# Change 4th data path
-_to_replace = "data = sio.loadmat(str(dl_data_path/'TaizhouTestMapBinary.mat'))"
-_replacement = 'data = sio.loadmat(f"{base_path}/DL-data/Taizhou_3x3/TaizhouTestMapBinary.mat")'
-test.replace_line(_to_replace, _to_replace, _replacement)
 
 # Skip all cells inputing user defined values for filtering products to download
 skip_em = ["notebookUrl = url_w.URLWidget()",
