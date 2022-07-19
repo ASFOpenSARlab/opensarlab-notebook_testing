@@ -1,14 +1,18 @@
 # asf_jupyter_notebook_testing
 OpenSARlabs notebook testing module and notebook test scripts
 
-The tests are designed to be run in an instance of OpenSARlab. 
-First, go to https://opensarlab.asf.alaska.edu/, login, and start a server. 
+The tests are designed to be run in an instance of OpenSARlab.
 
+First, go to https://opensarlab.asf.alaska.edu/, login, and start a server.
+
+Open a terminal and
 
 Clone the repo into /home/joyvan
 
 git clone https://github.com/ASFOpenSARlab/opensarlab-notebook_testing.git opensarlab-notebook_testing
 
+
+cd opensarlab-notebook_testing
 
 
 The test suite requires the following directories and files to be set up:
