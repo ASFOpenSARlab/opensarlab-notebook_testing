@@ -23,8 +23,10 @@ To run the test script manually, I like to use the following command so runtime 
 	cd /home/jovyan/opensarlab-notebook_testing
 
 	source mamba_test_driver.sh 2> errors.txt
+	
+If the test script fails to complete, check /home/jovyan/opensarlab-notebook_testing/errors.txt to figure out what went wrong.
 
-Then, check the report in /home/jovyan/opensarlab-notebook_testing/reports for lines that do not include 'PASSED'.
+The test script should run to completion. When it finishes, check the report in /home/jovyan/opensarlab-notebook_testing/reports for lines that do not include 'PASSED'.
 
 Investigate any tests that resulted in 'FAILED' or 'EXCEPTION'.
 
