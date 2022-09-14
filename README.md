@@ -7,8 +7,10 @@ The tests are designed to be run in an instance of OpenSARlab.
 ### _Table of Contents_
 
 1. [**Getting Started**](#getting-started)
-2. [**Running Test (Auto)**](#running-test-auto)
-	- [**Generate `.netrc` File**](#generate-netrc-file)
+2. [**OSL Configuration**](#osl-configuration)
+	- [Generate `.netrc` File](#generate-netrc-file)
+	- [Testing Preparation](#testing-preparation)
+3. [**Running a Test Script**](#running-a-test-script)
 ---
 
 ## **Getting Started**
@@ -38,10 +40,10 @@ To setup the environment, follow these steps:
 
 ---
 
-## **Running Test (Auto)**
+## **OSL Configuration**
 ---
 
-This section will introduce users to running automated test scripts.
+This section will introduce users to setup a testing environment in OpenSARLab.
 
 ### **Generate `.netrc` File**
 ---
@@ -66,34 +68,62 @@ _*Note: A `.netrc` file is required for some of the notebooks that are run by th
 
 ---
 
-### **Running Automated Test Script**
+### **Testing Preparation**
 
 ---
 
-To do a test run against production OSL, you should be in the `master` branch of `/home/jovyan/notebooks` and the `main` branch of `/home/jovyan/conda_environments`.
+To use a test script in OSL, make sure that the directory you are going to test is in the right branch.
 
-If a feature branch of notebooks or `conda_environments` needs to be tested, switch into that branch before running the `mamba_test_driver.sh` script.
+#### **Testing on Production**
 
+This test script will allow you to test two of our main directories: `notebooks` and the `conda_environments`.
+
+To do a test run against production OSL, make sure that you are in:
+
+- `master` branch of `/home/jovyan/notebooks` 
+- `main` branch of `/home/jovyan/conda_environments`
+
+#### **Testing New Features**
+
+If you happen to add new features on a separate branch, make sure to switch to that branch before testing `notebooks` or the `conda_environments`.
+
+*Example:*
+
+Let's say that you have a new branch called `insar_update`, where it has additional packages included in your `conda_environments/Environment_Configs/insar_analysis_env.yml`.
+
+In order to test this, you will need to first switch into `insar_update` branch in `/home/jovyan/conda_environments` with following command:
+
+``` bash
+git checkout insar_update
+```
+
+Once you are in the correct branch, you should be able to run your test script.
 
 ---
 
-## **Running Test (Manual)**
+## **Running a Test Script**
+
+---
+
+In this section, we will introduce you to running a test script.
 
 ---
 
 To run the test script manually, I like to use the following command so runtime errors are recorded:
 
-	cd /home/jovyan/opensarlab-notebook_testing
-
-	source mamba_test_driver.sh 2> errors.txt
+``` bash
+# command 1: Change into test 
+cd /home/jovyan/opensarlab-notebook_testing
+source mamba_test_driver.sh 2> errors.txt
+```
 	
-If the test script fails to complete, check /home/jovyan/opensarlab-notebook_testing/errors.txt to figure out what went wrong.
+If the test script fails to complete, check `/home/jovyan/opensarlab-notebook_testing/errors.txt` to figure out what went wrong.
 
-The test script should run to completion. When it finishes, check the report in /home/jovyan/opensarlab-notebook_testing/reports for lines that do not include 'PASSED'.
+The test script should run to completion. When it finishes, check the report in `/home/jovyan/opensarlab-notebook_testing/reports` for lines that do not include `'PASSED'`.
 
-Investigate any tests that resulted in 'FAILED' or 'EXCEPTION'.
+Investigate any tests that resulted in `'FAILED'` or `'EXCEPTION'`.
 
-Note: It is ofter useful to run individual test scripts. To do so, the appropriate conda environment must be installed and activated.
+_**Note: It is ofter useful to run individual test scripts. To do so, the appropriate conda environment must be installed and activated.**_
 
 For example, from a terminal:
 
