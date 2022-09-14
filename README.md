@@ -66,10 +66,18 @@ _*Note: A `.netrc` file is required for some of the notebooks that are run by th
 
 ---
 
+### **Running Automated Test Script**
+
+---
+
 To do a test run against production OSL, you should be in the `master` branch of `/home/jovyan/notebooks` and the `main` branch of `/home/jovyan/conda_environments`.
 
-If a feature branch of notebooks or conda_environments needs to be tested, switch into that branch before running the `mamba_test_driver.sh` script.
+If a feature branch of notebooks or `conda_environments` needs to be tested, switch into that branch before running the `mamba_test_driver.sh` script.
 
+
+---
+
+## **Running Test (Manual)**
 
 ---
 
