@@ -10,7 +10,10 @@ The tests are designed to be run in an instance of OpenSARlab.
 2. [**OSL Configuration**](#osl-configuration)
 	- [Generate `.netrc` File](#generate-netrc-file)
 	- [Testing Preparation](#testing-preparation)
-3. [**Running a Test Script**](#running-a-test-script)
+3. [**Utilizing Test Script**](#utilizing-test-script)
+	- [Running a Test Script](#running-a-test-script)
+	- [Test Results](#test-results)
+4. [**Individual Test**](#individual-test)
 ---
 
 ## **Getting Started**
@@ -101,7 +104,7 @@ Once you are in the correct branch, you should be able to run your test script.
 
 ---
 
-## **Running a Test Script**
+## **Utilizing Test Script**
 
 ---
 
@@ -109,43 +112,97 @@ In this section, we will introduce you to running a test script.
 
 ---
 
-To run the test script manually, I like to use the following command so runtime errors are recorded:
+### **Running a Test Script**
+
+---
+
+To run the test script manually, use the following commands so the runtime errors are recorded:
 
 ``` bash
 # command 1: Change into test 
 cd /home/jovyan/opensarlab-notebook_testing
+
+# command 2: Run test script; record its result
 source mamba_test_driver.sh 2> errors.txt
 ```
-	
-If the test script fails to complete, check `/home/jovyan/opensarlab-notebook_testing/errors.txt` to figure out what went wrong.
 
-The test script should run to completion. When it finishes, check the report in `/home/jovyan/opensarlab-notebook_testing/reports` for lines that do not include `'PASSED'`.
+---	
+
+### **Test Results**
+
+---
+
+#### **Test Script Failure**
+
+If the test script fails to complete, check the generated log file located here: 
+
+``` bash
+/home/jovyan/opensarlab-notebook_testing/errors.txt
+```
+Inspect `errors.txt` to determine what went wrong.
+
+#### **Test Script Completion**
+
+The test script should run to completion. When it finishes, check the following location for the report:
+
+``` bash
+/home/jovyan/opensarlab-notebook_testing/reports
+```
+
+
+When looking at the report, you will need to look for lines that do not include `'PASSED'`.
 
 Investigate any tests that resulted in `'FAILED'` or `'EXCEPTION'`.
 
-_**Note: It is ofter useful to run individual test scripts. To do so, the appropriate conda environment must be installed and activated.**_
+---
 
-For example, from a terminal:
+## **Individual Test**
 
-	cd to /home/jovyan/opensarlab-notebook_testing/
-	
-	conda activate /home/jovyan/.local/envs/rtc_analysis
-	
-	python3 Test_Ecosystems_Ex1.py
+---
+
+It is often useful to run individual test scripts. To do so, the appropriate conda environment must be installed and activated.
+
+_Example_
+
+Run the following commands on terminal:
+
+``` bash
+# command 1: Move into testing repo
+cd /home/jovyan/opensarlab-notebook_testing/
+
+# command 2: Activate proper conda environment
+conda activate /home/jovyan/.local/envs/rtc_analysis
+
+# commaned 3: Manually run python test script
+python3 Test_Ecosystems_Ex1.py
+```
 
 
 Alternatively, the test script can be set up to run on a cron in an instance of OSL running in Amazon Workspace.
-Setup for cron to run mamba_test_driver.sh (Note: This requires sudo access in OSL):
+Setup for cron to run `mamba_test_driver.sh` (Note: This requires `sudo` access in OSL):
 
 1) Start an instance of OpenSarlabs in Amazon Workspace (this is necessarry to keep the instance open through internet outages and other interruptions).
 2) Open a terminal in OSL
-3) mkdir /home/joyvan/opensarlab-notebook_testing/keep_OSL_alive
-4) sudo apt update
-5) sudo apt-get install cron
-6) sudo service cron start
-7) crontab -e
-8) Enter the following in the crontab:
+3) Run the following commands:
+``` bash
+# command 1: Make new directory 
+mkdir /home/joyvan/opensarlab-notebook_testing/keep_OSL_alive
 
+# command 2: Update everything you have
+sudo apt update
+
+# command 3: Install cron
+sudo apt-get install cron
+
+# command 4: Activate cron
+sudo service cron start
+
+# command Use cron
+crontab -e
+```
+4) Enter the following in the crontab:
+
+``` bash
 DATEVAR=date +%Y%m%d_%H%M%S
 
 */30 * * * * echo $(date)  > /home/jovyan/opensarlab-notebook_testing/keep_OSL_alive/keep_alive$($DATEVAR).log 2>&1
@@ -159,3 +216,4 @@ SHELL=/bin/bash
 01 15 * * * /usr/bin/find /home/jovyan/opensarlab-notebook_testing/reports -name "*.txt" -type f -mtime +7 -delete
 
 20 15 * * * /usr/bin/find /home/jovyan/opensarlab-notebook_testing/keep_OSL_alive -name "keep_alive*" -type f -mtime +0 -delete
+```
