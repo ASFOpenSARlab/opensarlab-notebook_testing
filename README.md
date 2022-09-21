@@ -1,6 +1,6 @@
 # **ASF Jupyter Notebook Testing**
 
-This repository entails a notebook testing module and a notebook test scripts OpenSARlabs. 
+This repository contains a notebook testing module and a notebook test scripts OpenSARlabs. 
 
 The tests are designed to be run in an instance of OpenSARlab.
 
@@ -26,9 +26,9 @@ _Prerequisite: You will need to install Git. Refer to the [official documentatio
 To setup the environment, follow these steps:
 
 1. **Go to [OpenSARLab](https://opensarlab.asf.alaska.edu/)**.
-	1. If this is your first time, sign up for an account.
+	1. If you are setting up a test account for the first time, sign up for an account.
 	2. If you have an account, sign in.
-	3. Once you're in start the OSL server.
+	3. Once you're in, start the OSL server.
 
 2. **Clone repository in your OSL account**.
 	1. Open a terminal in your OSL account.
@@ -46,7 +46,7 @@ To setup the environment, follow these steps:
 ## **OSL Configuration**
 ---
 
-This section will introduce users to setup a testing environment in OpenSARLab.
+This section will introduce users to setting up a testing environment in OpenSARLab.
 
 ### **Generate `.netrc` File**
 ---
@@ -55,7 +55,7 @@ Before running the automated tests, you will need to generate a *`.netrc` file. 
 
 ![nav to `opensarlab-notebook_testing`](img/test_script_osl-test-nav.PNG)
 
-1. First, you will need to navigate to the `opensarlab-notebook_testing` directory via the left-hand panel. 
+1. First, navigate to the `opensarlab-notebook_testing` directory via the left-hand panel. 
 
 
 ![find and open `.netrc`](img/test_script_osl-make_netrc.PNG)
